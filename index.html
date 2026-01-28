@@ -83,6 +83,32 @@
           max-width: 1400px;
           margin: 0 auto;
           padding: 0 20px;
+          box-sizing: border-box;
+        }
+
+        /* 确保所有元素都使用正确的盒模型 */
+        * {
+          box-sizing: border-box;
+        }
+
+        /* 防止水平滚动 */
+        html, body {
+          overflow-x: hidden;
+          width: 100%;
+        }
+
+        /* 确保所有图片和媒体元素适应容器宽度 */
+        img, video, iframe {
+          max-width: 100%;
+          height: auto;
+        }
+
+        /* 确保代码块不会导致水平滚动 */
+        pre, code {
+          max-width: 100%;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
         }
 
         /* 导航栏 */
@@ -1087,32 +1113,64 @@
           
           .code-snippet {
             padding: 15px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .contact-info,
           .contact-form {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .project-item {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .education-info,
           .experience-info {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .skill-category {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .skills-chart {
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
           }
           
           .container {
             padding: 0 15px;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          
+          /* 确保所有卡片式元素都适应宽度 */
+          .hero-content,
+          .about-content,
+          .education-content,
+          .experience-content,
+          .skills-content,
+          .projects-content,
+          .contact-content {
+            width: 100%;
+            box-sizing: border-box;
+          }
+          
+          /* 确保技能网格在手机端正确显示 */
+          .skills-grid {
+            width: 100%;
+            box-sizing: border-box;
           }
         }
 
@@ -1166,9 +1224,9 @@
             box-shadow: none;
           }
           
-          /* 禁用Three.js场景以提高性能 */
+          /* 调整Three.js场景透明度以提高性能 */
           #three-container {
-            display: none;
+            opacity: 0.6;
           }
         }
 
@@ -1219,6 +1277,16 @@
             position: absolute;
             top: 20px;
             right: 20px;
+            z-index: 1001;
+          }
+          
+          .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
           }
           
           .navbar ul {
@@ -1233,9 +1301,10 @@
             background-color: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(10px);
             margin: 0;
-            padding: 100px 0;
+            padding: 100px 15px;
             transform: translateX(-100%);
             transition: transform 0.3s ease;
+            box-sizing: border-box;
           }
           
           .navbar ul.active {
@@ -1285,7 +1354,7 @@
                         <span class="neon-text">细心可靠</span>
                     </div>
                     <p class="summary">
-                        1983年出生，社恐属猪的人通常工作认真负责。年纪较大，不影响学习能力强，
+                        1983年出生，社恐属猪的人通常工作认真负责。年纪较大，却不影响学习能力强。
                         对办公自动化技术虽管中窥豹，却略知一二，非常适合文员岗位。
                     </p>
                     <div class="social-links">
@@ -1697,7 +1766,7 @@ function handleTask(task) {
         });
 
         // Three.js 场景
-        let scene, camera, renderer, controls, particles;
+        let scene, camera, renderer, controls, particles, particlePositions, originalPositions;
 
         function initThreeJS() {
           // 检查Three.js是否加载
@@ -1723,6 +1792,7 @@ function handleTask(task) {
             renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x000000, 0);
             
             // 添加到DOM
             const container = document.getElementById('three-container');
@@ -1730,20 +1800,14 @@ function handleTask(task) {
               container.appendChild(renderer.domElement);
             }
             
-            // 添加控制器
-            if (typeof THREE.OrbitControls !== 'undefined') {
-              controls = new THREE.OrbitControls(camera, renderer.domElement);
-              controls.enableDamping = true;
-              controls.dampingFactor = 0.05;
-              controls.enableZoom = false;
-              controls.enablePan = false;
-            }
-            
             // 创建粒子系统
             createParticles();
             
             // 创建灯光
             createLights();
+            
+            // 添加页面滚动事件监听
+            window.addEventListener('scroll', onScroll);
             
             // 动画循环
             animate();
@@ -1760,43 +1824,110 @@ function handleTask(task) {
           
           try {
             const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 1500;
+            const particlesCount = 5000; // 增加粒子数量
             
-            const posArray = new Float32Array(particlesCount * 3);
+            particlePositions = new Float32Array(particlesCount * 3);
+            originalPositions = new Float32Array(particlesCount * 3);
             
-            for (let i = 0; i < particlesCount * 3; i++) {
-              posArray[i] = (Math.random() - 0.5) * 10;
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+              // 创建一个球形分布的粒子系统
+              const radius = Math.random() * 15; // 增大粒子分布范围
+              const theta = Math.random() * Math.PI * 2;
+              const phi = Math.acos(2 * Math.random() - 1);
+              
+              const x = radius * Math.sin(phi) * Math.cos(theta);
+              const y = radius * Math.sin(phi) * Math.sin(theta);
+              const z = radius * Math.cos(phi);
+              
+              particlePositions[i] = x;
+              particlePositions[i + 1] = y;
+              particlePositions[i + 2] = z;
+              
+              // 保存原始位置
+              originalPositions[i] = x;
+              originalPositions[i + 1] = y;
+              originalPositions[i + 2] = z;
             }
             
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
             
+            // 创建发光粒子材质
             const particlesMaterial = new THREE.PointsMaterial({
-              size: 0.02,
+              size: 0.03,
               color: 0x00f0ff,
               transparent: true,
               opacity: 0.8,
-              blending: THREE.AdditiveBlending
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              // 添加发光效果
+              map: createGlowTexture(),
+              sizeAttenuation: true
             });
             
             particles = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particles);
             
-            // 创建连接线
+            // 创建更多的连接线
+            createConnections();
+          } catch (error) {
+            console.warn('创建粒子系统失败:', error);
+          }
+        }
+
+        // 创建发光纹理
+        function createGlowTexture() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
+          const context = canvas.getContext('2d');
+          
+          const gradient = context.createRadialGradient(
+            canvas.width / 2,
+            canvas.height / 2,
+            0,
+            canvas.width / 2,
+            canvas.height / 2,
+            canvas.width / 2
+          );
+          
+          gradient.addColorStop(0, 'rgba(0, 240, 255, 1)');
+          gradient.addColorStop(0.2, 'rgba(0, 240, 255, 0.8)');
+          gradient.addColorStop(0.4, 'rgba(0, 240, 255, 0.4)');
+          gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+          
+          context.fillStyle = gradient;
+          context.beginPath();
+          context.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+          context.fill();
+          
+          return new THREE.CanvasTexture(canvas);
+        }
+
+        // 创建连接线
+        function createConnections() {
+          if (typeof THREE === 'undefined') return;
+          
+          try {
             const lineMaterial = new THREE.LineBasicMaterial({
               color: 0x00f0ff,
               transparent: true,
-              opacity: 0.1
+              opacity: 0.1,
+              blending: THREE.AdditiveBlending
             });
             
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 100; i++) {
               const lineGeometry = new THREE.BufferGeometry();
               const linePoints = [];
               
-              for (let j = 0; j < 5; j++) {
+              for (let j = 0; j < 3; j++) {
+                const radius = Math.random() * 15;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
                 linePoints.push(new THREE.Vector3(
-                  (Math.random() - 0.5) * 10,
-                  (Math.random() - 0.5) * 10,
-                  (Math.random() - 0.5) * 10
+                  radius * Math.sin(phi) * Math.cos(theta),
+                  radius * Math.sin(phi) * Math.sin(theta),
+                  radius * Math.cos(phi)
                 ));
               }
               
@@ -1805,7 +1936,7 @@ function handleTask(task) {
               scene.add(line);
             }
           } catch (error) {
-            console.warn('创建粒子系统失败:', error);
+            console.warn('创建连接线失败:', error);
           }
         }
 
@@ -1823,9 +1954,42 @@ function handleTask(task) {
             const pointLight2 = new THREE.PointLight(0x00ff8f, 1);
             pointLight2.position.set(5, 5, 0);
             scene.add(pointLight2);
+            
+            // 添加更多灯光以增强发光效果
+            const pointLight3 = new THREE.PointLight(0x00f0ff, 0.5);
+            pointLight3.position.set(-5, -5, 0);
+            scene.add(pointLight3);
           } catch (error) {
             console.warn('创建灯光失败:', error);
           }
+        }
+
+        // 页面滚动事件处理
+        function onScroll() {
+          if (!particles || !originalPositions) return;
+          
+          const scrollTop = window.pageYOffset;
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const scrollProgress = scrollTop / (documentHeight - windowHeight);
+          
+          // 根据滚动进度调整粒子分布
+          const geometry = particles.geometry;
+          const positions = geometry.attributes.position.array;
+          
+          for (let i = 0; i < positions.length; i += 3) {
+            // 计算目标位置：滚动时粒子向中心聚合，滚动到底部时扩散
+            const targetX = originalPositions[i] * (1 - scrollProgress * 0.7);
+            const targetY = originalPositions[i + 1] * (1 - scrollProgress * 0.7);
+            const targetZ = originalPositions[i + 2] * (1 - scrollProgress * 0.7);
+            
+            // 平滑过渡
+            positions[i] += (targetX - positions[i]) * 0.05;
+            positions[i + 1] += (targetY - positions[i + 1]) * 0.05;
+            positions[i + 2] += (targetZ - positions[i + 2]) * 0.05;
+          }
+          
+          geometry.attributes.position.needsUpdate = true;
         }
 
         function animate() {
@@ -1835,12 +1999,22 @@ function handleTask(task) {
             requestAnimationFrame(animate);
             
             if (particles) {
-              particles.rotation.x += 0.0005;
-              particles.rotation.y += 0.0005;
-            }
-            
-            if (controls) {
-              controls.update();
+              // 缓慢旋转粒子系统
+              particles.rotation.x += 0.0002;
+              particles.rotation.y += 0.0003;
+              
+              // 为粒子添加微小的随机运动，使其更自然
+              const geometry = particles.geometry;
+              const positions = geometry.attributes.position.array;
+              
+              for (let i = 0; i < positions.length; i += 3) {
+                // 添加微小的随机位移
+                positions[i] += (Math.random() - 0.5) * 0.001;
+                positions[i + 1] += (Math.random() - 0.5) * 0.001;
+                positions[i + 2] += (Math.random() - 0.5) * 0.001;
+              }
+              
+              geometry.attributes.position.needsUpdate = true;
             }
             
             if (renderer && scene && camera) {
