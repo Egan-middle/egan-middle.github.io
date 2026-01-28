@@ -662,6 +662,18 @@
           box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
         }
 
+        @media (max-width: 480px) {
+          .skills-chart {
+            padding: 15px;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .skills-chart {
+            padding: 10px;
+          }
+        }
+
         .skills-radar {
           position: relative;
           width: 100%;
@@ -693,6 +705,40 @@
           
           .radar-label {
             font-size: 10px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .skills-radar {
+            height: 220px;
+          }
+          
+          .radar-bar {
+            height: 60px;
+          }
+          
+          .radar-label {
+            font-size: 8px;
+            margin-bottom: 5px;
+          }
+          
+          .radar-item {
+            transform-origin: center bottom;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .skills-radar {
+            height: 200px;
+          }
+          
+          .radar-bar {
+            height: 50px;
+            width: 8px;
+          }
+          
+          .radar-label {
+            font-size: 7px;
           }
         }
 
