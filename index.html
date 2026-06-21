@@ -196,7 +196,7 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),rgba(126,30,43,.05));font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:1.5px;color:var(--gold-soft);transition:border-color .6s ease;}
 .chip svg{width:13px;height:13px;stroke:var(--accent);transition:stroke .6s ease;}
 .chip.bless{font-family:'Ma Shan Zheng',cursive;font-size:14px;letter-spacing:3px;color:var(--gold-soft);}
-.info-desc{font-family:'Noto Serif SC',serif;font-size:14px;color:rgba(233,220,194,.74);line-height:1.7;max-width:300px;letter-spacing:.4px;text-align:justify;text-align-last:center;}
+.info-desc{font-family:'Noto Serif SC',serif;font-size:16px;color:rgba(233,220,194,.74);line-height:1.7;max-width:300px;letter-spacing:.4px;text-align:justify;text-align-last:center;}
 
 /* === Landing (惠山泥人 showcase) — fits one screen, adapts to viewport height === */
 .landing{position:fixed;inset:0;z-index:9998;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .6s ease;background:radial-gradient(ellipse 120% 90% at 50% 28%,#1a1108,#0a0603 75%);}
@@ -216,16 +216,16 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
 .landing-kicker{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:clamp(14px,3vh,24px);color:var(--gold);opacity:.8;line-height:1;flex-shrink:0;}
 .landing-kicker .zh{font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:4px;}
 .landing-kicker .en{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;opacity:.82;}
-.landing-hero{position:relative;width:min(360px,86vw,46vh);margin-bottom:clamp(14px,3vh,26px);flex-shrink:0;}
+.landing-hero{position:relative;width:min(360px,80vw,42vh);margin-bottom:clamp(14px,3vh,26px);flex-shrink:0;}
 .landing-hero img{display:block;width:100%;height:auto;border-radius:10px;box-shadow:0 0 0 1px rgba(201,162,75,.28),0 16px 40px rgba(0,0,0,.65),0 0 54px rgba(201,162,75,.2);}
 .landing-hero::before{content:'';position:absolute;inset:-7px;border:1px solid rgba(201,162,75,.2);border-radius:14px;pointer-events:none;}
 .landing-hero::after{content:'';position:absolute;inset:0;border-radius:10px;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(232,199,102,.1),transparent 70%);}
 .landing-title{font-family:'Ma Shan Zheng',cursive;font-size:clamp(30px,8vw,40px);color:var(--gold-soft);letter-spacing:7px;text-shadow:0 0 30px rgba(232,199,102,.42);margin-bottom:clamp(4px,1vh,8px);line-height:1;flex-shrink:0;}
-.landing-intro{font-family:'Noto Serif SC',serif;font-size:13.5px;line-height:1.8;color:rgba(233,220,194,.74);max-width:322px;letter-spacing:.4px;text-align:justify;text-align-last:center;margin-bottom:0;}
+.landing-intro{font-family:'Noto Serif SC',serif;font-size:15px;line-height:1.7;color:rgba(233,220,194,.74);max-width:322px;letter-spacing:.4px;text-align:justify;text-align-last:center;margin-bottom:0;}
 .landing-divider{display:flex;align-items:center;gap:10px;max-width:300px;width:100%;margin:clamp(8px,1.6vh,12px) 0 2px;color:rgba(243,228,184,.4);}
 .landing-divider::before,.landing-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,75,.3),transparent);}
 .landing-divider span{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;}
-.landing-intro-en{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;line-height:1.58;color:rgba(233,220,194,.62);max-width:322px;text-align:justify;margin-bottom:0;}
+.landing-intro-en{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15.5px;line-height:1.5;color:rgba(233,220,194,.62);max-width:322px;text-align:justify;margin-bottom:0;}
 .blessing{position:relative;max-width:300px;width:100%;margin:clamp(14px,3vh,24px) 0 clamp(16px,3.2vh,26px);padding:14px 18px 13px;border:1px solid rgba(201,162,75,.42);border-radius:10px;background:linear-gradient(180deg,rgba(30,18,7,.72),rgba(12,7,3,.72));box-shadow:0 0 26px rgba(201,162,75,.13),inset 0 0 0 1px rgba(201,162,75,.06);flex-shrink:0;}
 .blessing::before,.blessing::after{content:'';position:absolute;width:13px;height:13px;border:1px solid rgba(232,199,102,.55);}
 .blessing::before{top:5px;left:5px;border-right:none;border-bottom:none;}
@@ -236,13 +236,13 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
 .enter-btn{display:inline-flex;align-items:center;gap:9px;padding:12px 32px;border-radius:24px;border:1px solid rgba(232,199,102,.55);background:linear-gradient(135deg,rgba(201,162,75,.24),rgba(126,30,43,.12));color:var(--gold-soft);cursor:pointer;font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:5px;font-weight:500;box-shadow:0 0 0 1px rgba(201,162,75,.1),0 8px 24px rgba(0,0,0,.5),0 0 30px rgba(201,162,75,.24);transition:transform .25s ease;-webkit-tap-highlight-color:transparent;flex-shrink:0;margin-top:2px;}
 .enter-btn:active{transform:scale(.96);}
 .enter-btn svg{width:14px;height:14px;stroke:var(--gold-soft);}
-@media(max-height:780px){
+@media(max-height:810px){
   .landing-kicker .zh{font-size:12px}.landing-kicker .en{font-size:10px}
   .landing-kicker{margin-bottom:clamp(9px,2vh,14px)}
   .landing-hero{width:min(300px,82vw,38vh);margin-bottom:clamp(9px,2vh,16px)}
   .landing-title{font-size:clamp(26px,7vw,32px);margin-bottom:4px}
-  .landing-intro{font-size:12.5px;line-height:1.66}
-  .landing-intro-en{font-size:12.5px;line-height:1.5}
+  .landing-intro{font-size:13.5px;line-height:1.6}
+  .landing-intro-en{font-size:13.5px;line-height:1.48}
   .landing-divider{margin:7px 0 1px}
   .blessing{margin:clamp(9px,2vh,14px) 0 clamp(11px,2.4vh,18px);padding:11px 16px 10px}
   .bless-main{font-size:19px}.bless-zhu{font-size:15px}.bless-sub{font-size:10px;margin-top:5px}
@@ -253,8 +253,8 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
   .landing-kicker{margin-bottom:8px}.landing-kicker .zh{font-size:11px}.landing-kicker .en{font-size:9px}
   .landing-hero{width:min(240px,76vw,32vh);margin-bottom:8px}
   .landing-title{font-size:24px;margin-bottom:3px}
-  .landing-intro{font-size:11.5px;line-height:1.55}
-  .landing-intro-en{font-size:11.5px;line-height:1.45}
+  .landing-intro{font-size:12.5px;line-height:1.5}
+  .landing-intro-en{font-size:12.5px;line-height:1.42}
   .blessing{padding:9px 14px 8px;margin:8px 0 10px}
   .bless-main{font-size:17px}.bless-zhu{font-size:13px}.bless-sub{font-size:9px;margin-top:4px}
   .enter-btn{padding:9px 24px;font-size:12px}
@@ -284,11 +284,11 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
 .detail-label .lbl-zh{font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:4px;color:var(--accent);}
 .detail-label .lbl-en{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:rgba(243,228,184,.4);}
 .detail-label::before,.detail-label::after{content:'';flex:0 0 22px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 55%,transparent),transparent);}
-.detail-zh{font-family:'Noto Serif SC',serif;font-size:13.5px;line-height:1.95;color:rgba(233,220,194,.87);text-align:justify;letter-spacing:.4px;text-indent:2em;}
+.detail-zh{font-family:'Noto Serif SC',serif;font-size:15px;line-height:1.95;color:rgba(233,220,194,.87);text-align:justify;letter-spacing:.4px;text-indent:2em;}
 .detail-divider{display:flex;align-items:center;gap:10px;margin:18px 0 13px;color:rgba(243,228,184,.4);}
 .detail-divider::before,.detail-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,75,.32),transparent);}
 .detail-divider span{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;}
-.detail-en{font-family:'Cormorant Garamond',serif;font-size:14.5px;line-height:1.72;color:rgba(233,220,194,.74);text-align:justify;font-style:italic;}
+.detail-en{font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.72;color:rgba(233,220,194,.74);text-align:justify;font-style:italic;}
 
 /* === Swipe hint === */
 .swipe-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:11px;z-index:40;pointer-events:none;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:4px;font-weight:500;color:#F3E4B8;padding:8px 18px;border-radius:22px;background:linear-gradient(135deg,rgba(28,18,8,.92),rgba(12,8,4,.88));border:1px solid rgba(232,199,102,.5);box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 26px rgba(201,162,75,.28),inset 0 0 0 1px rgba(232,199,102,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:0 0 10px rgba(201,162,75,.6);opacity:0;transition:opacity .6s ease,transform .6s ease;}
@@ -314,9 +314,9 @@ html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);fo
 .p-dot.active{background:var(--accent);width:20px;border-radius:3px;box-shadow:0 0 12px var(--accent-glow);border-color:transparent;}
 .ep-num{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:#8a7b5a;opacity:.6;min-width:54px;text-align:center;}
 
-@media(max-height:720px){.fan-stage{height:35vh}.info-name{font-size:29px}.info-desc{font-size:12.5px;line-height:1.6}.ornament-svg{width:min(70vw,270px)}}
-@media(max-height:640px){.header{padding:8px 16px 0}.header-title{font-size:25px}.fan-stage{height:31vh}.card-name{font-size:18px}.info-name{font-size:24px}.info-desc{font-size:12px;line-height:1.55}.info-chips{margin:6px 0}.ornament-svg{width:min(60vw,210px)}}
-@media(min-height:820px){.fan-stage{height:37vh}.info-name{font-size:38px}.info-desc{font-size:14px}}
+@media(max-height:720px){.fan-stage{height:35vh}.info-name{font-size:29px}.info-desc{font-size:13.5px;line-height:1.55}.ornament-svg{width:min(70vw,270px)}}
+@media(max-height:640px){.header{padding:8px 16px 0}.header-title{font-size:25px}.fan-stage{height:31vh}.card-name{font-size:18px}.info-name{font-size:24px}.info-desc{font-size:13px;line-height:1.5}.info-chips{margin:6px 0}.ornament-svg{width:min(60vw,210px)}}
+@media(min-height:820px){.fan-stage{height:37vh}.info-name{font-size:38px}.info-desc{font-size:16px}}
 @media(prefers-reduced-motion){.card{transition-duration:.2s}.mote,.grain,.progress-fill,.ornament-svg,.halo,.card-shimmer::before,.bg-lacquer::before,.bg-lacquer::after,.header-sigil,.intro-sigil,.intro-embers{animation:none}.card.active .card-inner{animation:none}}
 </style>
 </head>
