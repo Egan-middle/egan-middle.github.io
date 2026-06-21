@@ -1,2296 +1,798 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人简历</title>
-    <style>
-        /* 全局变量 */
-        :root {
-          --primary-color: #00f0ff;
-          --secondary-color: #ff00ff;
-          --accent-color: #00ff8f;
-          --background-color: #0a0a0a;
-          --card-background: rgba(20, 20, 30, 0.8);
-          --text-color: #ffffff;
-          --text-secondary: #b0b0b0;
-          --border-color: rgba(0, 240, 255, 0.3);
-          --font-main: 'Rajdhani', sans-serif;
-          --font-code: 'Fira Code', monospace;
-          --transition: all 0.3s ease;
-          --glow-primary: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
-          --glow-secondary: 0 0 10px var(--secondary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--secondary-color);
-          --glow-accent: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
-        }
-
-        /* 全局样式重置 */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        /* 导入字体 */
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap');
-
-        body {
-          font-family: var(--font-main);
-          background-color: var(--background-color);
-          color: var(--text-color);
-          line-height: 1.6;
-          overflow-x: hidden;
-          position: relative;
-        }
-
-        /* 网格背景 */
-        .grid-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: -2;
-          background-image: 
-            linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
-          background-size: 50px 50px;
-          animation: gridMove 20s linear infinite;
-        }
-
-        /* Three.js 场景 */
-        #three-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: -1;
-          opacity: 0.8;
-        }
-
-        @keyframes gridMove {
-          0% {
-            background-position: 0 0;
-          }
-          100% {
-            background-position: 50px 50px;
-          }
-        }
-
-        /* 主容器 */
-        .container {
-          width: 100%;
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 0 20px;
-          box-sizing: border-box;
-        }
-
-        /* 确保所有元素都使用正确的盒模型 */
-        * {
-          box-sizing: border-box;
-        }
-
-        /* 防止水平滚动 */
-        html, body {
-          overflow-x: hidden;
-          width: 100%;
-        }
-
-        /* 确保所有图片和媒体元素适应容器宽度 */
-        img, video, iframe {
-          max-width: 100%;
-          height: auto;
-        }
-
-        /* 确保代码块不会导致水平滚动 */
-        pre, code {
-          max-width: 100%;
-          overflow-x: auto;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-        }
-
-        /* 导航栏 */
-        .navbar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          background-color: rgba(10, 10, 10, 0.8);
-          backdrop-filter: blur(10px);
-          z-index: 1000;
-          border-bottom: 1px solid var(--border-color);
-        }
-
-        .navbar ul {
-          display: flex;
-          justify-content: center;
-          list-style: none;
-          padding: 20px 0;
-          gap: 40px;
-        }
-
-        /* 汉堡菜单 */
-        .menu-toggle {
-          display: none;
-          flex-direction: column;
-          justify-content: space-around;
-          width: 30px;
-          height: 30px;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          padding: 0;
-          z-index: 1001;
-        }
-
-        .menu-toggle span {
-          width: 30px;
-          height: 2px;
-          background: var(--primary-color);
-          border-radius: 10px;
-          transition: all 0.3s ease;
-        }
-
-        .menu-toggle.active span:nth-child(1) {
-          transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .menu-toggle.active span:nth-child(2) {
-          opacity: 0;
-        }
-
-        .menu-toggle.active span:nth-child(3) {
-          transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .navbar a {
-          color: var(--text-color);
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 500;
-          transition: var(--transition);
-          position: relative;
-          padding: 5px 0;
-        }
-
-        .navbar a::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-          transition: var(--transition);
-        }
-
-        .navbar a:hover {
-          color: var(--primary-color);
-        }
-
-        .navbar a:hover::after {
-          width: 100%;
-        }
-
-        /* 个人信息部分 */
-        .hero {
-          height: 100vh;
-          display: flex;
-          align-items: center;
-          padding: 100px 0;
-        }
-
-        .hero-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          gap: 80px;
-        }
-
-        .hero-left {
-          flex: 1;
-        }
-
-        .hero-right {
-          flex: 1;
-          display: flex;
-          justify-content: center;
-        }
-
-        .name {
-          font-size: 72px;
-          font-weight: 700;
-          margin-bottom: 20px;
-          background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-          from {
-            text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
-          }
-          to {
-            text-shadow: 0 0 30px var(--secondary-color), 0 0 60px var(--secondary-color);
-          }
-        }
-
-        .title {
-          font-size: 36px;
-          font-weight: 500;
-          margin-bottom: 20px;
-          color: var(--text-color);
-        }
-
-        .subtitle {
-          font-size: 18px;
-          margin-bottom: 30px;
-          color: var(--text-secondary);
-        }
-
-        .neon-text {
-          color: var(--primary-color);
-          text-shadow: var(--glow-primary);
-          animation: neonPulse 2s infinite;
-        }
-
-        @keyframes neonPulse {
-          0% {
-            text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
-          }
-          50% {
-            text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
-          }
-          100% {
-            text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
-          }
-        }
-
-        .summary {
-          font-size: 18px;
-          margin-bottom: 40px;
-          color: var(--text-secondary);
-          max-width: 600px;
-        }
-
-        .social-links {
-          display: flex;
-          gap: 20px;
-        }
-
-        .social-link {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 50px;
-          height: 50px;
-          border: 1px solid var(--border-color);
-          border-radius: 50%;
-          color: var(--primary-color);
-          transition: var(--transition);
-          background-color: rgba(0, 240, 255, 0.1);
-        }
-
-        .social-link:hover {
-          background-color: rgba(0, 240, 255, 0.2);
-          box-shadow: var(--glow-primary);
-          transform: translateY(-5px);
-        }
-
-        .avatar-container {
-          position: relative;
-        }
-
-        .avatar-border {
-          position: relative;
-          width: 300px;
-          height: 300px;
-          border-radius: 50%;
-          border: 2px solid var(--primary-color);
-          box-shadow: var(--glow-primary);
-          animation: rotate 10s linear infinite;
-        }
-
-        @keyframes rotate {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        .avatar {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 280px;
-          height: 280px;
-          border-radius: 50%;
-          background-image: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20cartoon%20pig%20avatar%2C%20tech%20style%2C%20dark%20background%2C%20futuristic%20lighting&image_size=square');
-          background-size: cover;
-          background-position: center;
-          border: 2px solid var(--secondary-color);
-        }
-
-        /* 通用section样式 */
-        .section {
-          padding: 100px 0;
-          position: relative;
-        }
-
-        .section-header {
-          display: flex;
-          align-items: center;
-          margin-bottom: 60px;
-        }
-
-        .section-title {
-          font-size: 36px;
-          font-weight: 600;
-          margin-right: 20px;
-          color: var(--text-color);
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .section-number {
-          color: var(--primary-color);
-          font-size: 24px;
-          font-weight: 700;
-        }
-
-        .section-line {
-          flex: 1;
-          height: 1px;
-          background: linear-gradient(90deg, var(--primary-color), transparent);
-        }
-
-        /* 关于我 */
-        .about-content {
-          max-width: 1000px;
-          margin: 0 auto;
-        }
-
-        .about-content p {
-          font-size: 18px;
-          margin-bottom: 20px;
-          color: var(--text-secondary);
-          line-height: 1.8;
-        }
-
-        .code-snippet {
-          margin-top: 40px;
-          padding: 30px;
-          background-color: rgba(10, 10, 20, 0.8);
-          border-radius: 10px;
-          border-left: 4px solid var(--primary-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-
-        .code-snippet pre {
-          font-family: var(--font-code);
-          font-size: 14px;
-          line-height: 1.5;
-          overflow-x: auto;
-        }
-
-        .code-snippet code {
-          color: var(--accent-color);
-        }
-
-        /* 教育背景 */
-        .education-content {
-          max-width: 1000px;
-          margin: 0 auto;
-        }
-
-        .education-item {
-          display: flex;
-          gap: 40px;
-          margin-bottom: 60px;
-          position: relative;
-        }
-
-        .education-item::before {
-          content: '';
-          position: absolute;
-          left: 100px;
-          top: 50px;
-          bottom: -50px;
-          width: 2px;
-          background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-        }
-
-        .education-item:last-child::before {
-          display: none;
-        }
-
-        .education-date {
-          width: 200px;
-          font-size: 18px;
-          font-weight: 600;
-          color: var(--primary-color);
-          padding-top: 5px;
-        }
-
-        .education-info {
-          flex: 1;
-          background-color: var(--card-background);
-          padding: 30px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-          transition: var(--transition);
-        }
-
-        .education-info:hover {
-          box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
-          transform: translateY(-5px);
-        }
-
-        .education-info h3 {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 10px;
-          color: var(--text-color);
-        }
-
-        .education-school {
-          font-size: 16px;
-          color: var(--primary-color);
-          margin-bottom: 15px;
-        }
-
-        .education-description {
-          font-size: 16px;
-          color: var(--text-secondary);
-          line-height: 1.6;
-        }
-
-        /* 工作经历 */
-        .experience-content {
-          max-width: 1000px;
-          margin: 0 auto;
-        }
-
-        .experience-item {
-          display: flex;
-          gap: 40px;
-          margin-bottom: 60px;
-          position: relative;
-        }
-
-        .experience-item::before {
-          content: '';
-          position: absolute;
-          left: 100px;
-          top: 50px;
-          bottom: -50px;
-          width: 2px;
-          background: linear-gradient(to bottom, var(--secondary-color), var(--primary-color));
-        }
-
-        .experience-item:last-child::before {
-          display: none;
-        }
-
-        .experience-date {
-          width: 200px;
-          font-size: 18px;
-          font-weight: 600;
-          color: var(--secondary-color);
-          padding-top: 5px;
-        }
-
-        .experience-info {
-          flex: 1;
-          background-color: var(--card-background);
-          padding: 30px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(255, 0, 255, 0.1);
-          transition: var(--transition);
-        }
-
-        .experience-info:hover {
-          box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
-          transform: translateY(-5px);
-        }
-
-        .experience-info h3 {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 10px;
-          color: var(--text-color);
-        }
-
-        .experience-company {
-          font-size: 16px;
-          color: var(--secondary-color);
-          margin-bottom: 15px;
-        }
-
-        .experience-description {
-          font-size: 16px;
-          color: var(--text-secondary);
-          line-height: 1.6;
-          list-style-position: inside;
-        }
-
-        .experience-description li {
-          margin-bottom: 10px;
-        }
-
-        /* 技能 */
-        .skills-content {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .skills-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 40px;
-          margin-bottom: 80px;
-        }
-
-        .skill-category {
-          background-color: var(--card-background);
-          padding: 30px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-          transition: var(--transition);
-        }
-
-        .skill-category:hover {
-          box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
-          transform: translateY(-5px);
-        }
-
-        .skill-category h3 {
-          font-size: 20px;
-          font-weight: 600;
-          margin-bottom: 20px;
-          color: var(--primary-color);
-        }
-
-        .skill-item {
-          margin-bottom: 20px;
-          position: relative;
-        }
-
-        .skill-name {
-          display: block;
-          font-size: 16px;
-          font-weight: 500;
-          margin-bottom: 10px;
-          color: var(--text-color);
-        }
-
-        .skill-progress {
-          width: 100%;
-          height: 8px;
-          background-color: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .skill-fill {
-          height: 100%;
-          background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-          border-radius: 4px;
-          transition: width 1.5s ease-in-out;
-          position: relative;
-        }
-
-        .skill-fill::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: linear-gradient(
-            45deg,
-            rgba(255, 255, 255, 0.2) 25%,
-            transparent 25%,
-            transparent 50%,
-            rgba(255, 255, 255, 0.2) 50%,
-            rgba(255, 255, 255, 0.2) 75%,
-            transparent 75%,
-            transparent
-          );
-          background-size: 20px 20px;
-          animation: move 2s linear infinite;
-        }
-
-        @keyframes move {
-          0% {
-            background-position: 0 0;
-          }
-          100% {
-            background-position: 20px 20px;
-          }
-        }
-
-        .skill-percentage {
-          position: absolute;
-          right: 0;
-          top: 0;
-          color: var(--primary-color);
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .skills-chart {
-          max-width: 600px;
-          margin: 0 auto;
-          background-color: var(--card-background);
-          padding: 40px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-
-        @media (max-width: 480px) {
-          .skills-chart {
-            padding: 15px;
-          }
-        }
-
-        @media (max-width: 360px) {
-          .skills-chart {
-            padding: 10px;
-          }
-        }
-
-        .skills-radar {
-          position: relative;
-          width: 100%;
-          height: 400px;
-        }
-
-        @media (max-width: 768px) {
-          .skills-radar {
-            height: 300px;
-          }
-          
-          .radar-bar {
-            height: 100px;
-          }
-          
-          .radar-label {
-            font-size: 12px;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .skills-radar {
-            height: 250px;
-          }
-          
-          .radar-bar {
-            height: 80px;
-          }
-          
-          .radar-label {
-            font-size: 10px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .skills-radar {
-            height: 220px;
-          }
-          
-          .radar-bar {
-            height: 60px;
-          }
-          
-          .radar-label {
-            font-size: 8px;
-            margin-bottom: 5px;
-          }
-          
-          .radar-item {
-            transform-origin: center bottom;
-          }
-        }
-
-        @media (max-width: 360px) {
-          .skills-radar {
-            height: 200px;
-          }
-          
-          .radar-bar {
-            height: 50px;
-            width: 8px;
-          }
-          
-          .radar-label {
-            font-size: 7px;
-          }
-        }
-
-        .radar-background {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
-          border-radius: 50%;
-        }
-
-        .radar-item {
-          position: absolute;
-          width: 100%;
-          text-align: center;
-          transform-origin: center bottom;
-        }
-
-        .radar-item:nth-child(2) {
-          transform: rotate(0deg);
-        }
-
-        .radar-item:nth-child(3) {
-          transform: rotate(60deg);
-        }
-
-        .radar-item:nth-child(4) {
-          transform: rotate(120deg);
-        }
-
-        .radar-item:nth-child(5) {
-          transform: rotate(180deg);
-        }
-
-        .radar-item:nth-child(6) {
-          transform: rotate(240deg);
-        }
-
-        .radar-item:nth-child(7) {
-          transform: rotate(300deg);
-        }
-
-        .radar-label {
-          display: block;
-          color: var(--text-color);
-          font-size: 16px;
-          font-weight: 500;
-          margin-bottom: 10px;
-        }
-
-        .radar-bar {
-          position: relative;
-          width: 10px;
-          height: 150px;
-          background-color: rgba(255, 255, 255, 0.1);
-          margin: 0 auto;
-          border-radius: 5px;
-          overflow: hidden;
-        }
-
-        .radar-bar::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: var(--value);
-          background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
-          border-radius: 5px;
-          transition: height 1.5s ease-in-out;
-        }
-
-        /* 项目经验 */
-        .projects-content {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .project-item {
-          display: flex;
-          gap: 40px;
-          margin-bottom: 80px;
-          align-items: center;
-          background-color: var(--card-background);
-          padding: 40px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-          transition: var(--transition);
-        }
-
-        .project-item:hover {
-          box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
-          transform: translateY(-5px);
-        }
-
-        .project-item:nth-child(even) {
-          flex-direction: row-reverse;
-        }
-
-        .project-info {
-          flex: 1;
-        }
-
-        .project-title {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 20px;
-          color: var(--text-color);
-        }
-
-        .project-description {
-          font-size: 16px;
-          line-height: 1.6;
-          margin-bottom: 30px;
-          color: var(--text-secondary);
-        }
-
-        .project-tech {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .tech-tag {
-          padding: 5px 15px;
-          background-color: rgba(0, 240, 255, 0.1);
-          border: 1px solid var(--primary-color);
-          border-radius: 20px;
-          font-size: 14px;
-          color: var(--primary-color);
-          transition: var(--transition);
-        }
-
-        .tech-tag:hover {
-          background-color: rgba(0, 240, 255, 0.2);
-          box-shadow: var(--glow-primary);
-        }
-
-        .project-image {
-          flex: 1;
-          height: 300px;
-          border-radius: 10px;
-          overflow: hidden;
-          position: relative;
-          background-color: rgba(10, 10, 20, 0.8);
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-
-        .image-placeholder {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 24px;
-          font-weight: 600;
-          color: var(--primary-color);
-          background: linear-gradient(45deg, rgba(0, 240, 255, 0.1), rgba(255, 0, 255, 0.1));
-          transition: var(--transition);
-        }
-
-        .project-image:hover .image-placeholder {
-          box-shadow: inset 0 0 50px rgba(0, 240, 255, 0.2);
-        }
-
-        /* 联系方式 */
-        .contact-content {
-          max-width: 1000px;
-          margin: 0 auto;
-          display: flex;
-          gap: 60px;
-        }
-
-        .contact-info {
-          flex: 1;
-          background-color: var(--card-background);
-          padding: 40px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-
-        .contact-item {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          margin-bottom: 30px;
-          transition: var(--transition);
-        }
-
-        .contact-item:hover {
-          transform: translateX(10px);
-        }
-
-        .contact-item svg {
-          width: 24px;
-          height: 24px;
-          color: var(--primary-color);
-        }
-
-        .contact-item span {
-          font-size: 16px;
-          color: var(--text-secondary);
-        }
-
-        .contact-form {
-          flex: 1;
-          background-color: var(--card-background);
-          padding: 40px;
-          border-radius: 10px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-          width: 100%;
-          padding: 15px;
-          background-color: rgba(255, 255, 255, 0.1);
-          border: 1px solid var(--border-color);
-          border-radius: 5px;
-          color: var(--text-color);
-          font-family: var(--font-main);
-          font-size: 16px;
-          transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-          outline: none;
-          border-color: var(--primary-color);
-          box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-          color: var(--text-secondary);
-        }
-
-        .btn {
-          display: inline-block;
-          padding: 15px 30px;
-          background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-          border: none;
-          border-radius: 5px;
-          color: var(--background-color);
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: var(--transition);
-          font-family: var(--font-main);
-        }
-
-        .btn:hover {
-          box-shadow: var(--glow-primary);
-          transform: translateY(-5px);
-        }
-
-        /* 页脚 */
-        .footer {
-          background-color: rgba(10, 10, 10, 0.8);
-          padding: 40px 0;
-          border-top: 1px solid var(--border-color);
-        }
-
-        .footer-content {
-          max-width: 1200px;
-          margin: 0 auto;
-          text-align: center;
-          color: var(--text-secondary);
-        }
-
-        .footer-content p {
-          margin-bottom: 10px;
-          font-size: 14px;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 1200px) {
-          .hero-content {
-            gap: 40px;
-          }
-          
-          .project-item {
-            flex-direction: column;
-          }
-          
-          .project-item:nth-child(even) {
-            flex-direction: column;
-          }
-          
-          .project-image {
-            width: 100%;
-            height: 200px;
-          }
-        }
-
-        @media (max-width: 992px) {
-          .navbar ul {
-            gap: 20px;
-          }
-          
-          .navbar a {
-            font-size: 16px;
-          }
-          
-          .name {
-            font-size: 54px;
-          }
-          
-          .title {
-            font-size: 28px;
-          }
-          
-          .contact-content {
-            flex-direction: column;
-          }
-          
-          .education-item,
-          .experience-item {
-            flex-direction: column;
-            gap: 20px;
-          }
-          
-          .education-date,
-          .experience-date {
-            width: 100%;
-          }
-          
-          .education-item::before,
-          .experience-item::before {
-            display: none;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .hero {
-            padding: 80px 0;
-          }
-          
-          .hero-content {
-            flex-direction: column;
-            text-align: center;
-          }
-          
-          .hero-right {
-            margin-top: 40px;
-          }
-          
-          .avatar-border {
-            width: 200px;
-            height: 200px;
-          }
-          
-          .avatar {
-            width: 180px;
-            height: 180px;
-          }
-          
-          .section {
-            padding: 60px 0;
-          }
-          
-          .section-title {
-            font-size: 28px;
-          }
-          
-          .skills-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .navbar ul {
-            flex-wrap: wrap;
-            justify-content: center;
-          }
-          
-          .navbar li {
-            margin-bottom: 10px;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .name {
-            font-size: 36px;
-          }
-          
-          .title {
-            font-size: 20px;
-          }
-          
-          .subtitle {
-            font-size: 14px;
-          }
-          
-          .summary {
-            font-size: 16px;
-            line-height: 1.6;
-          }
-          
-          .section-title {
-            font-size: 20px;
-          }
-          
-          .section {
-            padding: 40px 0;
-          }
-          
-          .code-snippet {
-            padding: 15px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .contact-info,
-          .contact-form {
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .project-item {
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .education-info,
-          .experience-info {
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .skill-category {
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .skills-chart {
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          .container {
-            padding: 0 15px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          /* 确保所有卡片式元素都适应宽度 */
-          .hero-content,
-          .about-content,
-          .education-content,
-          .experience-content,
-          .skills-content,
-          .projects-content,
-          .contact-content {
-            width: 100%;
-            box-sizing: border-box;
-          }
-          
-          /* 确保技能网格在手机端正确显示 */
-          .skills-grid {
-            width: 100%;
-            box-sizing: border-box;
-          }
-        }
-
-        /* 鼠标跟随效果 */
-        .cursor {
-          position: fixed;
-          width: 20px;
-          height: 20px;
-          border: 2px solid var(--primary-color);
-          border-radius: 50%;
-          background-color: rgba(0, 240, 255, 0.1);
-          pointer-events: none;
-          z-index: 9999;
-          transition: all 0.1s ease;
-          mix-blend-mode: difference;
-        }
-        
-        .cursor-hover {
-          width: 40px;
-          height: 40px;
-          background-color: rgba(0, 240, 255, 0.2);
-          box-shadow: var(--glow-primary);
-        }
-
-        /* 手机端性能优化 */
-        @media (max-width: 768px) {
-          /* 禁用鼠标跟随效果 */
-          .cursor {
-            display: none;
-          }
-          
-          /* 禁用网格背景动画 */
-          .grid-container {
-            animation: none;
-          }
-          
-          /* 简化技能条动画 */
-          .skill-fill::after {
-            animation: none;
-          }
-          
-          /* 简化悬停效果 */
-          .social-link:hover,
-          .education-info:hover,
-          .experience-info:hover,
-          .skill-category:hover,
-          .project-item:hover,
-          .tech-tag:hover,
-          .btn:hover {
-            transform: none;
-            box-shadow: none;
-          }
-          
-          /* 调整Three.js场景透明度以提高性能 */
-          #three-container {
-            opacity: 0.6;
-          }
-        }
-
-        /* 加载动画 */
-        .loader {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: var(--background-color);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 99999;
-          transition: opacity 0.5s ease;
-        }
-        
-        .loader-content {
-          text-align: center;
-        }
-        
-        .loader-spinner {
-          width: 60px;
-          height: 60px;
-          border: 4px solid rgba(0, 240, 255, 0.2);
-          border-top: 4px solid var(--primary-color);
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
-        .loader p {
-          color: var(--primary-color);
-          font-size: 18px;
-          font-weight: 600;
-        }
-
-        /* 响应式导航栏 */
-        @media (max-width: 768px) {
-          .menu-toggle {
-            display: flex;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1001;
-          }
-          
-          .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 0 15px;
-            box-sizing: border-box;
-          }
-          
-          .navbar ul {
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background-color: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
-            margin: 0;
-            padding: 100px 15px;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            box-sizing: border-box;
-          }
-          
-          .navbar ul.active {
-            transform: translateX(0);
-          }
-        }
-    </style>
-    <script src="https://code.bdstatic.com/npm/three@0.128.0/build/three.min.js"></script>
-    <script src="https://code.bdstatic.com/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0c0703">
+<title>五路财神 · Five Gods of Wealth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0c0703;
+  --lacquer:#150d06;
+  --gold:#C9A24B;
+  --gold-bright:#E8C766;
+  --gold-soft:#F3E4B8;
+  --parchment:#E9DCC2;
+  --muted:#9C8E72;
+  --accent:#D9B05A;
+  --accent-deep:#3D2E10;
+  --accent-glow:#E0B85A;
+  --parallax:0px;
+}
+
+/* ===== Intro : 开光仪式 ===== */
+.intro{position:fixed;inset:0;z-index:9999;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse 120% 90% at 50% 42%,#1c1207,#0a0603 72%);}
+.intro-bg{position:absolute;inset:0;background:radial-gradient(circle 520px at 50% 44%,rgba(201,162,75,.08),transparent 70%);}
+.intro-sand{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.6px 1.6px at 18% 28%,rgba(232,199,102,.7),transparent 60%),radial-gradient(1px 1px at 72% 60%,rgba(243,228,184,.6),transparent 60%),radial-gradient(2px 2px at 42% 82%,rgba(201,162,75,.5),transparent 60%),radial-gradient(1px 1px at 86% 24%,rgba(232,199,102,.6),transparent 60%),radial-gradient(1.4px 1.4px at 56% 14%,rgba(243,228,184,.5),transparent 60%),radial-gradient(1px 1px at 30% 66%,rgba(201,162,75,.5),transparent 60%);animation:ember 18s linear infinite;opacity:.55;}
+.intro.hidden{opacity:0;transition:opacity .5s ease;pointer-events:none;}
+
+/* 自绘金钱法阵 */
+.intro-sigil{position:absolute;left:50%;top:50%;width:min(94vw,380px);height:min(94vw,380px);transform:translate(-50%,-50%);z-index:1;opacity:0;animation:sigilFade .9s ease .15s forwards,sigilSpin 70s linear infinite;pointer-events:none;}
+@keyframes sigilFade{to{opacity:.92}}
+@keyframes sigilSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.intro-sigil svg{width:100%;height:100%;}
+.intro-sigil .draw{fill:none;stroke:#E8C766;stroke-width:.7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 4px rgba(232,199,102,.8));}
+.intro.go .intro-sigil .draw{animation:drawLine 1.2s ease forwards;}
+.intro.go .intro-sigil .c1{animation-delay:.30s}.intro.go .intro-sigil .c2{animation-delay:.45s}
+.intro.go .intro-sigil .c3{animation-delay:.60s}.intro.go .intro-sigil .c4{animation-delay:.75s}
+.intro.go .intro-sigil .sq{animation-delay:.90s}.intro.go .intro-sigil .spokes .draw{animation-delay:1.05s}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.intro-sigil .dots{opacity:0;}
+.intro.go .intro-sigil .dots{animation:dotIn .5s ease 1.25s forwards;}
+@keyframes dotIn{to{opacity:.9}}
+
+/* 题字 灰暗→鎏金 */
+.intro-kicker{position:relative;z-index:3;font-family:'Cinzel',serif;font-size:10px;letter-spacing:8px;color:var(--gold);opacity:0;}
+.intro-title{position:relative;z-index:3;font-family:'Ma Shan Zheng',cursive;font-size:clamp(58px,19vw,100px);line-height:.95;letter-spacing:6px;margin:14px 0 10px;color:#5a4a2e;filter:brightness(.55) saturate(.6);opacity:0;text-shadow:none;}
+.intro-sub{position:relative;z-index:3;font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:7px;color:rgba(243,228,184,.5);opacity:0;}
+.intro.go .intro-kicker{animation:softIn .9s ease 1.25s forwards;}
+.intro.go .intro-title{animation:softIn 1s ease 1.35s forwards;}
+.intro.go .intro-sub{animation:softIn .9s ease 1.6s forwards;}
+@keyframes softIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.intro.ignite .intro-title{color:var(--gold-soft);filter:brightness(1.05) saturate(1.05);text-shadow:0 0 40px rgba(232,199,102,.65),0 0 12px rgba(243,228,184,.5);transition:color .5s ease,filter .5s ease,text-shadow .5s ease;}
+.intro.ignite .intro-kicker,.intro.ignite .intro-sub{color:rgba(243,228,184,.85);transition:color .5s ease;}
+
+/* 下注金光 */
+.intro-shaft{position:absolute;left:50%;top:-12%;width:min(70vw,300px);height:130%;transform:translateX(-50%) scaleY(0);transform-origin:top center;z-index:2;opacity:0;background:linear-gradient(180deg,rgba(243,228,184,0) 0%,rgba(243,228,184,.55) 16%,rgba(232,199,102,.35) 44%,rgba(201,162,75,0) 86%);filter:blur(6px);mix-blend-mode:screen;pointer-events:none;}
+.intro.shaft-on .intro-shaft{opacity:1;animation:shaftDown .6s cubic-bezier(.2,.8,.3,1) forwards;}
+@keyframes shaftDown{0%{transform:translateX(-50%) scaleY(0)}100%{transform:translateX(-50%) scaleY(1)}}
+.intro.ignite .intro-shaft{opacity:0;transition:opacity .5s ease .05s;}
+
+/* 亮闪 */
+.intro-flash{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 46%,rgba(255,255,255,.95),rgba(243,228,184,.6) 22%,rgba(232,199,102,.25) 45%,transparent 70%);mix-blend-mode:screen;}
+.intro-flash.on{animation:flare .55s ease-out;}
+@keyframes flare{0%{opacity:0}18%{opacity:.95}100%{opacity:0}}
+
+/* 金沙·铜钱迸发 */
+.intro-burst{position:absolute;left:50%;top:46%;width:0;height:0;z-index:4;pointer-events:none;}
+.intro-burst .bit{position:absolute;left:0;top:0;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:radial-gradient(circle,#F3E4B8,#C9A24B 60%,transparent 72%);box-shadow:0 0 6px rgba(232,199,102,.85);opacity:0;}
+.intro-burst.go .bit{animation:burstOut .95s cubic-bezier(.15,.7,.3,1) forwards;}
+@keyframes burstOut{0%{opacity:0;transform:translate(0,0) scale(.3)}15%{opacity:1}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(1)}}
+
+/* 朱印 招財進寶 */
+.intro-seal{position:absolute;left:50%;top:50%;z-index:5;transform:translate(-50%,-50%) scale(2.4) translateY(-40px) rotate(-10deg);opacity:0;pointer-events:none;}
+.intro-seal.drop{animation:sealDrop .65s cubic-bezier(.2,1.4,.4,1) forwards;}
+@keyframes sealDrop{0%{opacity:0;transform:translate(-50%,-50%) scale(2.4) translateY(-40px) rotate(-10deg)}60%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0)}}
+.seal-grid{display:grid;grid-template-columns:1fr 1fr;width:clamp(96px,26vw,120px);height:clamp(96px,26vw,120px);background:linear-gradient(135deg,#9e1b22,#7a141a);border-radius:7px;box-shadow:0 0 0 2px rgba(243,228,184,.5),0 10px 30px rgba(0,0,0,.6),0 0 44px rgba(201,162,75,.5);padding:9px;}
+.seal-grid span{font-family:'Ma Shan Zheng',cursive;font-size:clamp(28px,7.6vw,38px);color:#F3E4B8;display:flex;align-items:center;justify-content:center;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+
+/* 收尾金幕 */
+.intro-veil{position:absolute;left:50%;top:50%;width:24px;height:24px;z-index:6;border-radius:50%;opacity:0;background:radial-gradient(circle,rgba(243,228,184,.95),rgba(201,162,75,.6) 50%,rgba(201,162,75,0) 70%);pointer-events:none;}
+.intro-veil.on{animation:veilCover .8s ease-in forwards;}
+@keyframes veilCover{0%{opacity:0;transform:translate(-50%,-50%) scale(1)}30%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(60)}}
+
+/* 跳过 */
+.intro-skip{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));right:20px;z-index:7;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:rgba(243,228,184,.6);padding:9px 16px;border:1px solid rgba(232,199,102,.32);border-radius:20px;background:rgba(12,7,3,.5);cursor:pointer;opacity:0;transition:opacity .5s;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(3px);}
+.intro-skip.on{opacity:1;}
+@media(prefers-reduced-motion){.intro-sigil,.intro-sand{animation:none}.intro-sigil{opacity:.7}}
+
+html,body{height:100%;width:100%;background:var(--ink);color:var(--parchment);font-family:'Noto Serif SC','Poppins',serif;overflow:hidden;-webkit-font-smoothing:antialiased;touch-action:none;user-select:none;}
+
+/* === 背景 : 漆底金辉 === */
+.bg-lacquer{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(ellipse 60% 60% at 50% 112%,rgba(201,162,75,.18),transparent 60%),
+  radial-gradient(ellipse 40% 50% at 50% 100%,rgba(126,30,43,.12),transparent 58%),
+  radial-gradient(ellipse 140% 100% at 50% 100%,#1a1108 0%,#100a05 48%,#0c0703 100%);}
+.bg-lacquer::before{content:'';position:absolute;left:50%;bottom:-8%;width:150%;height:80%;transform:translateX(calc(-50% + var(--parallax)));background:radial-gradient(ellipse 42% 100% at 50% 100%,rgba(232,199,102,.13),transparent 60%),radial-gradient(ellipse 60% 70% at 30% 100%,rgba(126,30,43,.12),transparent 60%);pointer-events:none;will-change:transform;animation:auraDrift 16s ease-in-out infinite alternate;}
+@keyframes auraDrift{0%{transform:translateX(calc(-50% + var(--parallax))) translateY(0)}100%{transform:translateX(calc(-50% + var(--parallax))) translateY(-3%)}}
+.bg-lacquer::after{content:'';position:absolute;inset:0;background:
+  radial-gradient(circle 420px at 18% 24%,rgba(201,162,75,.08) 0%,transparent 100%),
+  radial-gradient(circle 340px at 84% 70%,rgba(126,30,43,.07) 0%,transparent 100%),
+  radial-gradient(circle 260px at 70% 16%,rgba(31,107,71,.05) 0%,transparent 100%);animation:nebulaPulse 14s ease-in-out infinite alternate;}
+@keyframes nebulaPulse{0%{opacity:1}100%{opacity:.45}}
+
+.grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");animation:grainShift .5s steps(4) infinite;}
+@keyframes grainShift{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-2%)}100%{transform:translate(3%,3%)}}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 180px 70px rgba(2,1,2,.92);}
+
+/* === 金沙天降 === */
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;transform:translateX(calc(var(--parallax) * 1.8));will-change:transform;}
+.mote{position:absolute;border-radius:50%;opacity:0;animation:moteFloat linear infinite;background:radial-gradient(circle,#F3E4B8 0%,rgba(232,199,102,.9) 40%,transparent 70%);box-shadow:0 0 6px rgba(201,162,75,.7);}
+.mote.ruby{background:radial-gradient(circle,#FFD0CC 0%,rgba(209,75,92,.85) 40%,transparent 70%);box-shadow:0 0 6px rgba(209,75,92,.6);}
+.mote.coin{border-radius:50%;background:radial-gradient(circle,#F3E4B8 0%,#C9A24B 55%,transparent 72%);box-shadow:0 0 5px rgba(201,162,75,.8);}
+.mote.coin::after{content:'';position:absolute;inset:30%;border:1px solid rgba(60,40,12,.55);border-radius:1px;}
+@keyframes moteFloat{0%{transform:translateY(-8vh) translateX(0) scale(.4) rotate(0);opacity:0}12%{opacity:.95}50%{transform:translateY(48vh) translateX(14px) scale(1) rotate(180deg)}88%{opacity:.7}100%{transform:translateY(108vh) translateX(-10px) scale(.5) rotate(360deg);opacity:0}}
+.mote.tw{animation-name:moteTwinkle,moteFloat;animation-duration:2.4s,12s;}
+@keyframes moteTwinkle{0%,100%{filter:brightness(1)}50%{filter:brightness(1.8)}}
+
+/* === App === */
+.app{position:relative;z-index:2;height:100%;height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+
+/* === Header === */
+.header{flex-shrink:0;padding:12px 24px 0;text-align:center;}
+.header-titles{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.header-sigil{width:20px;height:20px;margin:0 auto 7px;display:block;animation:sigilSpin 24s linear infinite;color:var(--gold);filter:drop-shadow(0 0 6px rgba(201,162,75,.55));}
+@keyframes sigilSpin{to{transform:rotate(360deg)}}
+.header-kicker{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:5px;color:var(--gold);opacity:.5;font-weight:600;margin-bottom:5px;padding-left:6px}
+.header-title{font-family:'Ma Shan Zheng',cursive;font-size:30px;letter-spacing:4px;color:var(--gold-soft);text-shadow:0 0 26px rgba(201,162,75,.45);padding-left:4px;line-height:1}
+.header-sub{font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:6px;color:rgba(243,228,184,.7);font-weight:400;margin-top:7px;padding-left:8px}
+.header-line{height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,75,.1),var(--accent-glow),rgba(201,162,75,.1),transparent);margin-top:11px;position:relative;transition:background .6s ease;}
+.header-line::after{content:'';position:absolute;top:50%;left:50%;width:5px;height:5px;background:var(--accent);transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 9px var(--accent-glow);transition:background .6s ease,box-shadow .6s ease;}
+
+/* === Fan Stage === */
+.fan-stage{flex:0 0 auto;height:35vh;position:relative;z-index:3;display:flex;align-items:center;justify-content:center;perspective:1400px;}
+
+/* 金钱法阵 */
+.halo{position:absolute;top:50%;left:50%;width:min(78vw,330px);height:min(78vw,330px);transform:translate(-50%,-50%);pointer-events:none;z-index:1;opacity:.85;animation:auraBreath 5s ease-in-out infinite;color:var(--accent);}
+@keyframes auraBreath{0%,100%{opacity:.55;filter:blur(.5px)}50%{opacity:.9;filter:blur(0)}}
+.halo .glow-blob{position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 28%,transparent) 0%,rgba(201,162,75,.14) 45%,transparent 72%);filter:blur(8px);}
+.halo .ring-outer{animation:spinCW 60s linear infinite;transform-origin:100px 100px;}
+.halo .ring-inner{animation:spinCCW 38s linear infinite;transform-origin:100px 100px;}
+@keyframes spinCW{to{transform:rotate(360deg)}}
+@keyframes spinCCW{to{transform:rotate(-360deg)}}
+
+/* === Card === */
+.card{position:absolute;width:min(44vw,200px,18vh);transition:transform .75s cubic-bezier(0.22,1,0.36,1),opacity .6s ease,filter .6s ease;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;will-change:transform,filter;z-index:5;}
+.card-inner{position:relative;width:100%;aspect-ratio:300/520;border-radius:12px;overflow:hidden;background:#0a0a12;touch-action:none;box-shadow:0 24px 60px rgba(0,0,0,.85),inset 0 0 0 1px rgba(201,162,75,.22),inset 0 0 0 4px rgba(0,0,0,0);transition:box-shadow .6s ease,filter .5s ease;}
+.card-bg{position:absolute;inset:0;background:radial-gradient(120% 72% at 50% 6%,var(--cg) 0%,transparent 56%),linear-gradient(180deg,var(--c) 0%,var(--cd) 100%);}
+.card-pattern{position:absolute;inset:0;opacity:.5;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><path d='M0 20 H40 M20 0 V40' stroke='%23ffffff' stroke-width='0' /><circle cx='20' cy='20' r='7' fill='none' stroke='%23F3E4B8' stroke-width='.4' opacity='.5'/><rect x='17' y='17' width='6' height='6' fill='none' stroke='%23F3E4B8' stroke-width='.4' opacity='.5'/></svg>");background-size:38px 38px;mix-blend-mode:overlay;}
+.card-glow{position:absolute;left:50%;top:42%;width:75%;height:55%;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center,color-mix(in srgb,var(--cg) 55%,transparent),transparent 70%);filter:blur(6px);pointer-events:none;}
+.card-pedestal{position:absolute;left:50%;bottom:21%;width:74%;height:14px;transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(0,0,0,.55),transparent 70%);pointer-events:none;}
+.card-pedestal::before{content:'';position:absolute;left:50%;bottom:1px;width:88%;height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,var(--gold-bright),transparent);opacity:.6;}
+.card-figure{position:absolute;left:50%;bottom:7%;height:90%;width:auto;transform:translateX(-50%);object-fit:contain;pointer-events:none;-webkit-user-drag:none;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55));}
+.card-shimmer{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;border-radius:12px;}
+.card-shimmer::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(105deg,transparent 0%,rgba(243,228,184,0) 40%,rgba(243,228,184,.22) 50%,rgba(243,228,184,0) 60%,transparent 100%);transform:skewX(-18deg);animation:shimmerSweep 6s ease-in-out infinite;}
+@keyframes shimmerSweep{0%,70%{left:-60%}100%{left:130%}}
+.corner{position:absolute;width:17px;height:17px;z-index:5;pointer-events:none;opacity:.85;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E8C766' stroke-width='1.1' stroke-linecap='round'><path d='M2 13 V5 Q2 2.5 4.5 2.5 H13'/><path d='M2 8.5 Q5.5 8.5 8 6 Q10.5 3.5 10.5 0.5' opacity='.65'/><circle cx='4.4' cy='4.4' r='1' fill='%23F3E4B8' stroke='none'/></svg>") center/contain no-repeat;}
+.corner.tl{top:6px;left:6px}.corner.tr{top:6px;right:6px;transform:scaleX(-1)}.corner.bl{bottom:6px;left:6px;transform:scaleY(-1)}.corner.br{bottom:6px;right:6px;transform:scale(-1)}
+.card-seal{position:absolute;top:11px;left:50%;transform:translateX(-50%);z-index:6;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,rgba(20,12,4,.55),rgba(8,5,2,.85));box-shadow:0 0 0 1px rgba(243,228,184,.45),0 2px 8px rgba(0,0,0,.5);pointer-events:none;}
+.card-seal span{font-family:'Ma Shan Zheng',cursive;font-size:20px;line-height:1;color:var(--accent);text-shadow:0 0 10px var(--accent-glow);}
+.card-label{position:absolute;bottom:0;left:0;right:0;padding:30px 12px 14px;text-align:center;z-index:4;background:linear-gradient(to top,rgba(8,5,2,.94) 0%,rgba(8,5,2,.55) 55%,transparent 100%);}
+.card-honor{font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:3px;color:var(--gold);opacity:.85;margin-bottom:4px;font-weight:500}
+.card-name{font-family:'ZCOOL XiaoWei',serif;font-size:21px;font-weight:400;color:var(--gold-soft);line-height:1.1;text-shadow:0 1px 10px rgba(0,0,0,.7),0 0 18px var(--accent-glow);}
+.card-pinyin{font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:400;font-style:italic;color:rgba(243,228,184,.6);letter-spacing:1.5px;margin-top:3px}
+
+/* states */
+.card.active{z-index:10;transform:translateY(-8px) scale(1.05);}
+.card.active .card-inner{box-shadow:0 40px 90px rgba(0,0,0,.9),0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent),0 0 60px color-mix(in srgb,var(--accent-glow) 45%,transparent),0 0 26px rgba(126,30,43,.16);animation:activeGlow 4s ease-in-out infinite;}
+@keyframes activeGlow{0%,100%{box-shadow:0 40px 90px rgba(0,0,0,.9),0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent),0 0 60px color-mix(in srgb,var(--accent-glow) 40%,transparent),0 0 26px rgba(126,30,43,.14)}50%{box-shadow:0 40px 90px rgba(0,0,0,.9),0 0 0 1px color-mix(in srgb,var(--accent) 80%,transparent),0 0 80px color-mix(in srgb,var(--accent-glow) 55%,transparent),0 0 34px rgba(126,30,43,.22)}}
+.card.left{z-index:5;transform:translateX(-47%) rotateZ(-13deg) translateY(30px) scale(0.88);}
+.card.left .card-inner{filter:blur(2.2px) brightness(.46) saturate(.85);}
+.card.right{z-index:5;transform:translateX(47%) rotateZ(13deg) translateY(30px) scale(0.88);}
+.card.right .card-inner{filter:blur(2.2px) brightness(.46) saturate(.85);}
+.card.hidden{z-index:1;opacity:0;pointer-events:none;transform:translateY(60px) scale(0.7);filter:blur(6px);}
+.card-trail{position:absolute;inset:-3px;border-radius:13px;pointer-events:none;opacity:0;z-index:6;box-shadow:0 0 0 1.5px rgba(243,228,184,.6),0 0 46px var(--accent-glow);transition:opacity .25s ease;}
+.card.trailing .card-trail{opacity:1}
+.card.instant{transition:none !important;}
+.card.instant .card-inner{transition:none !important;animation:none !important;}
+
+/* === Coin ornament === */
+.ornament-wrap{flex-shrink:0;display:flex;justify-content:center;margin-top:-8px;margin-bottom:-4px;pointer-events:none;position:relative;z-index:2;}
+.ornament-svg{width:min(80vw,320px);height:auto;animation:ornFloat 7s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(201,162,75,.25));}
+@keyframes ornFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* === Info Panel === */
+.info-panel{flex:1;text-align:center;padding:6px 28px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;}
+.info-panel::-webkit-scrollbar{display:none}
+.info-tag{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;color:var(--accent);opacity:.85;margin-bottom:4px;font-weight:600;transition:color .6s ease;}
+.info-tag .honor{font-family:'Noto Serif SC',serif;letter-spacing:4px;}
+.info-name{font-family:'ZCOOL XiaoWei',serif;font-size:34px;font-weight:400;color:var(--gold-soft);line-height:1.15;text-shadow:0 0 28px var(--accent-glow);transition:text-shadow .6s ease;}
+.info-pinyin{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:400;font-style:italic;color:var(--accent);opacity:.8;letter-spacing:2px;margin-top:2px;transition:color .6s ease;}
+.info-chips{display:flex;gap:9px;margin:9px 0 8px;flex-wrap:wrap;justify-content:center;}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:14px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),rgba(126,30,43,.05));font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:1.5px;color:var(--gold-soft);transition:border-color .6s ease;}
+.chip svg{width:13px;height:13px;stroke:var(--accent);transition:stroke .6s ease;}
+.chip.bless{font-family:'Ma Shan Zheng',cursive;font-size:14px;letter-spacing:3px;color:var(--gold-soft);}
+.info-desc{font-family:'Noto Serif SC',serif;font-size:14px;color:rgba(233,220,194,.74);line-height:1.7;max-width:300px;letter-spacing:.4px;text-align:justify;text-align-last:center;}
+
+/* === Landing (惠山泥人 showcase) — fits one screen, adapts to viewport height === */
+.landing{position:fixed;inset:0;z-index:9998;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .6s ease;background:radial-gradient(ellipse 120% 90% at 50% 28%,#1a1108,#0a0603 75%);}
+.landing.open{opacity:1;pointer-events:auto;}
+.landing-bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle 480px at 50% 26%,rgba(201,162,75,.1),transparent 70%);}
+.landing-inner{position:relative;height:100%;max-width:480px;margin:0 auto;padding:calc(clamp(12px,2.6vh,22px) + env(safe-area-inset-top)) 22px calc(clamp(14px,2.8vh,28px) + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.landing.open .landing-inner>*{animation:landRise .7s ease both;}
+.landing.open .landing-kicker{animation-delay:.05s}
+.landing.open .landing-hero{animation-delay:.16s}
+.landing.open .landing-title{animation-delay:.30s}
+.landing.open .landing-intro{animation-delay:.40s}
+.landing.open .landing-divider{animation-delay:.46s}
+.landing.open .landing-intro-en{animation-delay:.50s}
+.landing.open .blessing{animation-delay:.58s}
+.landing.open .enter-btn{animation-delay:.72s}
+@keyframes landRise{from{transform:translateY(16px)}to{transform:translateY(0)}}
+.landing-kicker{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:clamp(14px,3vh,24px);color:var(--gold);opacity:.8;line-height:1;flex-shrink:0;}
+.landing-kicker .zh{font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:4px;}
+.landing-kicker .en{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2.5px;opacity:.82;}
+.landing-hero{position:relative;width:min(360px,86vw,46vh);margin-bottom:clamp(14px,3vh,26px);flex-shrink:0;}
+.landing-hero img{display:block;width:100%;height:auto;border-radius:10px;box-shadow:0 0 0 1px rgba(201,162,75,.28),0 16px 40px rgba(0,0,0,.65),0 0 54px rgba(201,162,75,.2);}
+.landing-hero::before{content:'';position:absolute;inset:-7px;border:1px solid rgba(201,162,75,.2);border-radius:14px;pointer-events:none;}
+.landing-hero::after{content:'';position:absolute;inset:0;border-radius:10px;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(232,199,102,.1),transparent 70%);}
+.landing-title{font-family:'Ma Shan Zheng',cursive;font-size:clamp(30px,8vw,40px);color:var(--gold-soft);letter-spacing:7px;text-shadow:0 0 30px rgba(232,199,102,.42);margin-bottom:clamp(4px,1vh,8px);line-height:1;flex-shrink:0;}
+.landing-intro{font-family:'Noto Serif SC',serif;font-size:13.5px;line-height:1.8;color:rgba(233,220,194,.74);max-width:322px;letter-spacing:.4px;text-align:justify;text-align-last:center;margin-bottom:0;}
+.landing-divider{display:flex;align-items:center;gap:10px;max-width:300px;width:100%;margin:clamp(8px,1.6vh,12px) 0 2px;color:rgba(243,228,184,.4);}
+.landing-divider::before,.landing-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,75,.3),transparent);}
+.landing-divider span{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;}
+.landing-intro-en{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;line-height:1.58;color:rgba(233,220,194,.62);max-width:322px;text-align:justify;margin-bottom:0;}
+.blessing{position:relative;max-width:300px;width:100%;margin:clamp(14px,3vh,24px) 0 clamp(16px,3.2vh,26px);padding:14px 18px 13px;border:1px solid rgba(201,162,75,.42);border-radius:10px;background:linear-gradient(180deg,rgba(30,18,7,.72),rgba(12,7,3,.72));box-shadow:0 0 26px rgba(201,162,75,.13),inset 0 0 0 1px rgba(201,162,75,.06);flex-shrink:0;}
+.blessing::before,.blessing::after{content:'';position:absolute;width:13px;height:13px;border:1px solid rgba(232,199,102,.55);}
+.blessing::before{top:5px;left:5px;border-right:none;border-bottom:none;}
+.blessing::after{bottom:5px;right:5px;border-left:none;border-top:none;}
+.bless-zhu{font-family:'Ma Shan Zheng',cursive;font-size:17px;color:#C0392B;letter-spacing:2px;margin-bottom:3px;opacity:.92;text-shadow:0 0 10px rgba(192,57,43,.4);}
+.bless-main{font-family:'ZCOOL XiaoWei',serif;font-size:22px;color:var(--gold-soft);letter-spacing:3px;text-shadow:0 0 16px rgba(232,199,102,.35);line-height:1.2;}
+.bless-sub{font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:5px;color:rgba(243,228,184,.56);margin-top:7px;}
+.enter-btn{display:inline-flex;align-items:center;gap:9px;padding:12px 32px;border-radius:24px;border:1px solid rgba(232,199,102,.55);background:linear-gradient(135deg,rgba(201,162,75,.24),rgba(126,30,43,.12));color:var(--gold-soft);cursor:pointer;font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:5px;font-weight:500;box-shadow:0 0 0 1px rgba(201,162,75,.1),0 8px 24px rgba(0,0,0,.5),0 0 30px rgba(201,162,75,.24);transition:transform .25s ease;-webkit-tap-highlight-color:transparent;flex-shrink:0;margin-top:2px;}
+.enter-btn:active{transform:scale(.96);}
+.enter-btn svg{width:14px;height:14px;stroke:var(--gold-soft);}
+@media(max-height:780px){
+  .landing-kicker .zh{font-size:12px}.landing-kicker .en{font-size:10px}
+  .landing-kicker{margin-bottom:clamp(9px,2vh,14px)}
+  .landing-hero{width:min(300px,82vw,38vh);margin-bottom:clamp(9px,2vh,16px)}
+  .landing-title{font-size:clamp(26px,7vw,32px);margin-bottom:4px}
+  .landing-intro{font-size:12.5px;line-height:1.66}
+  .landing-intro-en{font-size:12.5px;line-height:1.5}
+  .landing-divider{margin:7px 0 1px}
+  .blessing{margin:clamp(9px,2vh,14px) 0 clamp(11px,2.4vh,18px);padding:11px 16px 10px}
+  .bless-main{font-size:19px}.bless-zhu{font-size:15px}.bless-sub{font-size:10px;margin-top:5px}
+  .enter-btn{padding:10px 28px;font-size:13px}
+}
+@media(max-height:600px){
+  .landing-inner{padding-top:calc(8px + env(safe-area-inset-top));padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+  .landing-kicker{margin-bottom:8px}.landing-kicker .zh{font-size:11px}.landing-kicker .en{font-size:9px}
+  .landing-hero{width:min(240px,76vw,32vh);margin-bottom:8px}
+  .landing-title{font-size:24px;margin-bottom:3px}
+  .landing-intro{font-size:11.5px;line-height:1.55}
+  .landing-intro-en{font-size:11.5px;line-height:1.45}
+  .blessing{padding:9px 14px 8px;margin:8px 0 10px}
+  .bless-main{font-size:17px}.bless-zhu{font-size:13px}.bless-sub{font-size:9px;margin-top:4px}
+  .enter-btn{padding:9px 24px;font-size:12px}
+}
+
+/* === 详细信息 button === */
+.detail-btn{margin-top:8px;display:inline-flex;align-items:center;gap:7px;padding:8px 19px;border-radius:18px;border:1px solid color-mix(in srgb,var(--accent) 42%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 14%,transparent),rgba(126,30,43,.06));color:var(--gold-soft);cursor:pointer;transition:transform .25s ease,border-color .6s ease,box-shadow .35s ease;font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:3px;font-weight:500;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 8%,transparent),0 0 18px color-mix(in srgb,var(--accent) 12%,transparent);-webkit-tap-highlight-color:transparent;}
+.detail-btn:active{transform:scale(.95);}
+.detail-btn svg{width:12px;height:12px;stroke:var(--accent);transition:stroke .6s ease;}
+
+/* === Detail overlay (bottom sheet) === */
+.detail-overlay{position:fixed;inset:0;z-index:9990;display:flex;align-items:flex-end;justify-content:center;background:rgba(5,3,1,.8);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;pointer-events:none;transition:opacity .4s ease;}
+.detail-overlay.open{opacity:1;pointer-events:auto;}
+.detail-panel{position:relative;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#191109,#0c0703 60%);border-top:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:20px 20px 0 0;box-shadow:0 -24px 70px rgba(0,0,0,.75),0 0 50px color-mix(in srgb,var(--accent) 22%,transparent);transform:translateY(100%);transition:transform .45s cubic-bezier(.2,.8,.3,1);overflow:hidden;}
+.detail-overlay.open .detail-panel{transform:translateY(0);}
+.detail-grip{flex-shrink:0;width:38px;height:4px;border-radius:2px;background:color-mix(in srgb,var(--accent) 50%,transparent);margin:10px auto 2px;}
+.detail-head{position:relative;flex-shrink:0;padding:4px 56px 8px;text-align:center;}
+.detail-kicker{font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:3px;color:var(--accent);opacity:.82;}
+.detail-name{font-family:'ZCOOL XiaoWei',serif;font-size:30px;color:var(--gold-soft);line-height:1.15;text-shadow:0 0 24px var(--accent-glow);margin-top:2px;}
+.detail-pinyin{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--accent);opacity:.78;letter-spacing:2px;}
+.detail-close{position:absolute;top:12px;right:14px;width:30px;height:30px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:rgba(10,6,3,.6);color:rgba(243,228,184,.8);font-size:13px;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;}
+.detail-chips{flex-shrink:0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 20px 12px;}
+.detail-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 26px calc(26px + env(safe-area-inset-bottom));scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--accent) 40%,transparent) transparent;}
+.detail-body::-webkit-scrollbar{width:3px;}
+.detail-body::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 40%,transparent);border-radius:2px;}
+.detail-label{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:11px;}
+.detail-label .lbl-zh{font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:4px;color:var(--accent);}
+.detail-label .lbl-en{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:rgba(243,228,184,.4);}
+.detail-label::before,.detail-label::after{content:'';flex:0 0 22px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 55%,transparent),transparent);}
+.detail-zh{font-family:'Noto Serif SC',serif;font-size:13.5px;line-height:1.95;color:rgba(233,220,194,.87);text-align:justify;letter-spacing:.4px;text-indent:2em;}
+.detail-divider{display:flex;align-items:center;gap:10px;margin:18px 0 13px;color:rgba(243,228,184,.4);}
+.detail-divider::before,.detail-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,75,.32),transparent);}
+.detail-divider span{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;}
+.detail-en{font-family:'Cormorant Garamond',serif;font-size:14.5px;line-height:1.72;color:rgba(233,220,194,.74);text-align:justify;font-style:italic;}
+
+/* === Swipe hint === */
+.swipe-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:11px;z-index:40;pointer-events:none;font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:4px;font-weight:500;color:#F3E4B8;padding:8px 18px;border-radius:22px;background:linear-gradient(135deg,rgba(28,18,8,.92),rgba(12,8,4,.88));border:1px solid rgba(232,199,102,.5);box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 26px rgba(201,162,75,.28),inset 0 0 0 1px rgba(232,199,102,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-shadow:0 0 10px rgba(201,162,75,.6);opacity:0;transition:opacity .6s ease,transform .6s ease;}
+.swipe-hint.show{animation:hintIn .8s ease forwards,hintBob 2.4s ease-in-out 1s infinite;}
+@keyframes hintIn{to{opacity:1}}
+@keyframes hintBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(3px)}}
+.swipe-hint.gone{opacity:0 !important;transform:translateX(-50%) translateY(6px) !important;animation:none !important}
+.swipe-hint .chev{width:16px;height:16px;stroke:#F3E4B8;filter:drop-shadow(0 0 5px rgba(201,162,75,.8))}
+.swipe-hint .chev.l{animation:chevL 1.8s ease-in-out infinite}
+.swipe-hint .chev.r{animation:chevR 1.8s ease-in-out infinite}
+@keyframes chevL{0%,100%{transform:translateX(6px);opacity:.35}50%{transform:translateX(-3px);opacity:1}}
+@keyframes chevR{0%,100%{transform:translateX(-6px);opacity:.35}50%{transform:translateX(3px);opacity:1}}
+
+/* === Controls === */
+.controls{flex-shrink:0;padding:2px 24px 16px;}
+.progress-line{height:2px;background:rgba(255,255,255,.07);border-radius:2px;margin-bottom:11px;position:relative;overflow:visible;}
+.progress-fill{height:100%;border-radius:2px;position:relative;background:linear-gradient(90deg,color-mix(in srgb,var(--accent-deep) 70%,#7E1E2B),var(--gold-bright) 42%,var(--gold-soft) 50%,var(--gold-bright) 58%,color-mix(in srgb,var(--accent-deep) 70%,#7E1E2B));background-size:200% 100%;animation:flowMove 2.8s linear infinite;box-shadow:0 0 12px var(--accent-glow);transition:width .6s cubic-bezier(0.22,1,0.36,1);}
+@keyframes flowMove{to{background-position:200% 0}}
+.progress-fill::after{content:'';position:absolute;right:-3px;top:-3px;width:7px;height:7px;border-radius:50%;background:var(--gold-soft);box-shadow:0 0 12px var(--accent-glow);}
+.bottom-row{display:flex;align-items:center;justify-content:center;gap:9px;}
+.p-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.14);transition:all .5s cubic-bezier(0.16,1,0.3,1);cursor:pointer;border:1px solid rgba(201,162,75,.2);}
+.p-dot:hover{background:rgba(201,162,75,.4)}
+.p-dot.active{background:var(--accent);width:20px;border-radius:3px;box-shadow:0 0 12px var(--accent-glow);border-color:transparent;}
+.ep-num{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:#8a7b5a;opacity:.6;min-width:54px;text-align:center;}
+
+@media(max-height:720px){.fan-stage{height:35vh}.info-name{font-size:29px}.info-desc{font-size:12.5px;line-height:1.6}.ornament-svg{width:min(70vw,270px)}}
+@media(max-height:640px){.header{padding:8px 16px 0}.header-title{font-size:25px}.fan-stage{height:31vh}.card-name{font-size:18px}.info-name{font-size:24px}.info-desc{font-size:12px;line-height:1.55}.info-chips{margin:6px 0}.ornament-svg{width:min(60vw,210px)}}
+@media(min-height:820px){.fan-stage{height:37vh}.info-name{font-size:38px}.info-desc{font-size:14px}}
+@media(prefers-reduced-motion){.card{transition-duration:.2s}.mote,.grain,.progress-fill,.ornament-svg,.halo,.card-shimmer::before,.bg-lacquer::before,.bg-lacquer::after,.header-sigil,.intro-sigil,.intro-embers{animation:none}.card.active .card-inner{animation:none}}
+</style>
 </head>
 <body>
-    <!-- 网格背景 -->
-    <div class="grid-container"></div>
-    
-    <!-- Three.js 场景 -->
-    <div id="three-container"></div>
-    
-    <!-- 主容器 -->
-    <div class="container">
-        <!-- 导航栏 -->
-        <nav class="navbar">
-            <div class="menu-toggle" id="menuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <ul id="navMenu">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#about">关于我</a></li>
-                <li><a href="#education">教育背景</a></li>
-                <li><a href="#experience">工作经历</a></li>
-                <li><a href="#skills">技能</a></li>
-                <li><a href="#projects">项目经验</a></li>
-                <li><a href="#contact">联系方式</a></li>
-            </ul>
-        </nav>
-        
-        <!-- 个人信息部分 -->
-        <section id="home" class="hero">
-            <div class="hero-content">
-                <div class="hero-left">
-                    <h1 class="name">Egan</h1>
-                    <h2 class="title">求职文员工作/薪资要求3000起</h2>
-                    <div class="subtitle">
-                        <span class="neon-text">日语爱好者</span> | 
-                        <span class="neon-text">办公自动化专家</span> | 
-                        <span class="neon-text">细心可靠</span>
-                    </div>
-                    <p class="summary">
-                        1983年出生，社恐属猪的人通常工作认真负责。年纪较大，却不影响学习能力强。
-                        对办公自动化技术虽管中窥豹，却略知一二，非常适合文员岗位。
-                    </p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                        </a>
-                        <a href="#" class="social-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                        </a>
-                        <a href="#" class="social-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                        </a>
-                        <a href="#" class="social-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                        </a>
-                    </div>
-                </div>
-                <div class="hero-right">
-                    <div class="avatar-container">
-                        <div class="avatar-border">
-                            <div class="avatar"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 关于我 -->
-        <section id="about" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">01</span>
-                    关于我
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="about-content">
-                <p>
-                    我最擅长牛马干的脏活，能够认真负责地完成各项工作任务，
-                    无论工作多么繁琐，都能化腐朽为神奇，确保工作质量。
-                </p>
-                <p>
-                    求职要求：朝九晚五的文员岗位，用技术换时间，希望能够在稳定的工作环境中发挥自己的技能和经验。
-                </p>
-                <div class="code-snippet">
-                    <pre><code>// 我的工作理念
-function handleTask(task) {
-  // 分析任务需求
-  const requirements = analyze(task);
-  
-  // 设计高效解决方案
-  const solution = design(requirements);
-  
-  // 自动化处理
-  const result = automate(solution);
-  
-  // 检查质量
-  const quality = check(result);
-  
-  // 交付成果
-  return deliver(quality);
-}</code></pre>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 教育背景 -->
-        <section id="education" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">02</span>
-                    教育背景
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="education-content">
-                <div class="education-item">
-                    <div class="education-date">2001 - 2005</div>
-                    <div class="education-info">
-                        <h3>外国语学院</h3>
-                        <p class="education-school">江南大学</p>
-                        <p class="education-description">
-                            主修课程：日语、英语、第二专业国际贸易
-                            获得学士学位
-                        </p>
-                    </div>
-                </div>
-                <div class="education-item">
-                    <div class="education-date">2007</div>
-                    <div class="education-info">
-                        <h3>日语能力考1级</h3>
-                        <p class="education-school">兴趣是最好的学校</p>
-                        <p class="education-description">
-                            系统学习日语语法、听力、口语和写作
-                            通过日本语能力测试1级考试，能讲商务荤段子
-                        </p>
-                    </div>
-                </div>
-                <div class="education-item">
-                    <div class="education-date">2004</div>
-                    <div class="education-info">
-                        <h3>计算机等级考试3级偏软</h3>
-                        <p class="education-school">兴趣是最好的老师</p>
-                        <p class="education-description">
-                            系统学习计算机基础知识，数据库和软件应用
-                            通过计算机等级考试3级偏软考试
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 工作经历 -->
-        <section id="experience" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">03</span>
-                    工作经历
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="experience-content">
-                <div class="experience-item">
-                    <div class="experience-date">2020 - 至今</div>
-                    <div class="experience-info">
-                        <h3>办公自动化专员</h3>
-                        <p class="experience-company">苏州奔腾塑业有限公司</p>
-                        <ul class="experience-description">
-                            <li>开发Python爬虫程序，自动从网站获取数据并整理</li>
-                            <li>使用xlwings库实现Excel表格自动化操作，提高数据处理效率</li>
-                            <li>使用pandas库进行数据分析和处理</li>
-                            <li>负责日常办公文档的整理、归档和管理</li>
-                            <li>协助部门进行数据分析和报告生成</li>
-                            <li>使用TRAE/OPENCODE等工具优化工作流程</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 技能 -->
-        <section id="skills" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">04</span>
-                    技能
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="skills-content">
-                <div class="skills-grid">
-                    <div class="skill-category">
-                        <h3>办公技能</h3>
-                        <div class="skill-bar">
-                            <div class="skill-item">
-                                <span class="skill-name">Excel</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 90%"></div>
-                                </div>
-                                <span class="skill-percentage">90%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">Word</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 70%"></div>
-                                </div>
-                                <span class="skill-percentage">70%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">PowerPoint</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 70%"></div>
-                                </div>
-                                <span class="skill-percentage">70%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">TRAE</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 80%"></div>
-                                </div>
-                                <span class="skill-percentage">80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill-category">
-                        <h3>编程技能</h3>
-                        <div class="skill-bar">
-                            <div class="skill-item">
-                                <span class="skill-name">Python</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 85%"></div>
-                                </div>
-                                <span class="skill-percentage">85%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">xlwings</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 85%"></div>
-                                </div>
-                                <span class="skill-percentage">85%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">pandas</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 80%"></div>
-                                </div>
-                                <span class="skill-percentage">80%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">网络爬虫</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 80%"></div>
-                                </div>
-                                <span class="skill-percentage">80%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill-category">
-                        <h3>语言能力</h3>
-                        <div class="skill-bar">
-                            <div class="skill-item">
-                                <span class="skill-name">中文</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 100%"></div>
-                                </div>
-                                <span class="skill-percentage">100%</span>
-                            </div>
-                            <div class="skill-item">
-                                <span class="skill-name">日语</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 90%"></div>
-                                </div>
-                                <span class="skill-percentage">90%</span>
-                            </div>
- <div class="skill-item">
-                                <span class="skill-name">英语</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 70%"></div>
-                                </div>
-                                <span class="skill-percentage">70%</span>
-                            </div>
 
-<div class="skill-item">
-                                <span class="skill-name">吴地方言</span>
-                                <div class="skill-progress">
-                                    <div class="skill-fill" style="width: 95%"></div>
-                                </div>
-                                <span class="skill-percentage">95%</span>
-                            </div>
+<!-- 开光仪式 intro -->
+<div class="intro" id="intro">
+  <div class="intro-bg"></div>
+  <div class="intro-sand"></div>
 
+  <div class="intro-sigil">
+    <svg viewBox="0 0 200 200" fill="none">
+      <circle class="draw c1" pathLength="100" cx="100" cy="100" r="92"/>
+      <circle class="draw c2" pathLength="100" cx="100" cy="100" r="74"/>
+      <circle class="draw c3" pathLength="100" cx="100" cy="100" r="56"/>
+      <circle class="draw c4" pathLength="100" cx="100" cy="100" r="40"/>
+      <rect class="draw sq" pathLength="100" x="89" y="89" width="22" height="22"/>
+      <g class="spokes">
+        <path class="draw" pathLength="100" d="M100 8 V20"/>
+        <path class="draw" pathLength="100" d="M100 180 V192"/>
+        <path class="draw" pathLength="100" d="M8 100 H20"/>
+        <path class="draw" pathLength="100" d="M180 100 H192"/>
+      </g>
+      <g class="dots">
+        <circle cx="100" cy="8" r="2"/><circle cx="100" cy="192" r="2"/>
+        <circle cx="8" cy="100" r="2"/><circle cx="192" cy="100" r="2"/>
+      </g>
+    </svg>
+  </div>
 
-                        </div>
-                    </div>
-                </div>
-                <div class="skills-chart">
-                    <div class="skills-radar">
-                        <div class="radar-background"></div>
-                        <div class="radar-item">
-                            <span class="radar-label">办公技能</span>
-                            <div class="radar-bar" style="--value: 90%"></div>
-                        </div>
-                        <div class="radar-item">
-                            <span class="radar-label">编程技能</span>
-                            <div class="radar-bar" style="--value: 85%"></div>
-                        </div>
-                        <div class="radar-item">
-                            <span class="radar-label">语言能力</span>
-                            <div class="radar-bar" style="--value: 95%"></div>
-                        </div>
-                        <div class="radar-item">
-                            <span class="radar-label">数据处理</span>
-                            <div class="radar-bar" style="--value: 90%"></div>
-                        </div>
-                        <div class="radar-item">
-                            <span class="radar-label">文档管理</span>
-                            <div class="radar-bar" style="--value: 85%"></div>
-                        </div>
-                        <div class="radar-item">
-                            <span class="radar-label">自动化操作</span>
-                            <div class="radar-bar" style="--value: 80%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 项目经验 -->
-        <section id="projects" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">05</span>
-                    项目经验
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="projects-content">
-                <div class="project-item">
-                    <div class="project-info">
-                        <h3 class="project-title">Python爬虫数据采集系统</h3>
-                        <p class="project-description">
-                            开发了Python爬虫程序，自动从多个网站获取数据并整理到Excel表格中，
-                            大大提高了数据采集效率，减少了人工操作。
-                        </p>
-                        <div class="project-tech">
-                            <span class="tech-tag">Python</span>
-                            <span class="tech-tag">BeautifulSoup</span>
-                            <span class="tech-tag">Requests</span>
-                            <span class="tech-tag">Excel</span>
-                        </div>
-                    </div>
-                    <div class="project-image">
-                        <div class="image-placeholder">Python爬虫</div>
-                    </div>
-                </div>
-                <div class="project-item">
-                    <div class="project-info">
-                        <h3 class="project-title">Excel表格自动化系统</h3>
-                        <p class="project-description">
-                            使用xlwings库实现Excel表格自动化操作，包括数据导入、格式整理、公式计算等，
-                            提高了数据处理效率，减少了错误率。
-                        </p>
-                        <div class="project-tech">
-                            <span class="tech-tag">Python</span>
-                            <span class="tech-tag">xlwings</span>
-                            <span class="tech-tag">Excel</span>
-                            <span class="tech-tag">VBA</span>
-                        </div>
-                    </div>
-                    <div class="project-image">
-                        <div class="image-placeholder">Excel自动化</div>
-                    </div>
-                </div>
-                <div class="project-item">
-                    <div class="project-info">
-                        <h3 class="project-title">积极拥抱Vibe coding</h3>
-                        <p class="project-description">
-                            终身学习，致力于优化工作流程，提高工作效率，
-                            减少重复性工作。
-                        </p>
-                        <div class="project-tech">
-                            <span class="tech-tag">TRAE</span>
-                            <span class="tech-tag">办公自动化</span>
-                            <span class="tech-tag">流程优化</span>
-                        </div>
-                    </div>
-                    <div class="project-image">
-                        <div class="image-placeholder">VIBE CODING</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 联系方式 -->
-        <section id="contact" class="section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="section-number">06</span>
-                    联系方式
-                </h2>
-                <div class="section-line"></div>
-            </div>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span>电话保密</span>
-                    </div>
-                    <div class="contact-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span>邮箱保密</span>
-                    </div>
-                    <div class="contact-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>苏州奔腾塑业</span>
-                    </div>
-                </div>
-                
-            </div>
-        </section>
-        
-        <!-- 页脚 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <p>&copy; 2026 老牛马.</p>
-                <p>牛马人生 实力无限</p>
-            </div>
-        </footer>
+  <div class="intro-shaft"></div>
+
+  <div class="intro-kicker">FIVE GODS OF WEALTH</div>
+  <h1 class="intro-title" id="introTitle">五路财神</h1>
+  <div class="intro-sub">招财进宝 · 迎祥纳福</div>
+
+  <div class="intro-flash" id="introFlash"></div>
+  <div class="intro-burst" id="introBurst"></div>
+  <div class="intro-seal" id="introSeal"><div class="seal-grid"><span>招</span><span>財</span><span>進</span><span>寶</span></div></div>
+
+  <div class="intro-veil" id="introVeil"></div>
+
+  <button class="intro-skip" id="introSkip">跳过 ›</button>
+</div>
+
+<!-- 惠山泥人 landing -->
+<div class="landing" id="landing">
+  <div class="landing-bg"></div>
+  <div class="landing-inner">
+    <div class="landing-kicker"><span class="zh">国家级非物质文化遗产</span><span class="en">WUXI · HUISHAN CLAY FIGURINE</span></div>
+    <div class="landing-hero">
+      <img src="niren.png" alt="惠山泥人 · 五路财神">
     </div>
-    
-    <script>
-        // 汉堡菜单交互
-        document.addEventListener('DOMContentLoaded', function() {
-          const menuToggle = document.getElementById('menuToggle');
-          const navMenu = document.getElementById('navMenu');
-          
-          menuToggle.addEventListener('click', function() {
-            this.classList.toggle('active');
-            navMenu.classList.toggle('active');
-          });
-          
-          // 点击菜单项后关闭菜单
-          const navLinks = navMenu.querySelectorAll('a');
-          navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-              menuToggle.classList.remove('active');
-              navMenu.classList.remove('active');
-            });
-          });
-        });
+    <h2 class="landing-title">惠山泥人</h2>
+    <p class="landing-intro">无锡惠山传统彩塑，始于南北朝、盛于明清，列国家级非物质文化遗产。取惠山黑泥捏塑成型、彩绘开相，造型饱满圆润、设色明丽喜庆，传神写照，尤以「大阿福」与戏文人物名动天下。</p>
+    <div class="landing-divider"><span>ENGLISH</span></div>
+    <p class="landing-intro-en">Huishan Clay Figurines (惠山泥人), a traditional painted clay sculpture from Wuxi, Jiangsu. Rooted in the Northern and Southern Dynasties and flourishing through the Ming and Qing, it is listed among China's national intangible cultural heritage. Hand-shaped from Mount Huishan's dark clay and vividly painted, the figures are full and rounded, bright and festive — celebrated for the iconic 'Da A Fu' and lively opera characters.</p>
+    <div class="blessing">
+      <div class="bless-zhu">祝</div>
+      <div class="bless-main">贵司 · 生意兴隆</div>
+      <div class="bless-sub">财源广进 · 宏图大展</div>
+    </div>
+    <button class="enter-btn" id="enterBtn">
+      财神介绍
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</div>
 
-        // Three.js 场景
-        let scene, camera, renderer, controls, particles, particlePositions, originalPositions;
+<div class="bg-lacquer" id="bgDeep"></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="particles" id="particles"></div>
 
-        function initThreeJS() {
-          // 检查Three.js是否加载
-          if (typeof THREE === 'undefined') {
-            console.warn('Three.js 未加载，跳过3D场景初始化');
-            return;
-          }
-          
-          try {
-            // 创建场景
-            scene = new THREE.Scene();
-            
-            // 创建相机
-            camera = new THREE.PerspectiveCamera(
-              75,
-              window.innerWidth / window.innerHeight,
-              0.1,
-              1000
-            );
-            camera.position.z = 5;
-            
-            // 创建渲染器
-            renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setClearColor(0x000000, 0);
-            
-            // 添加到DOM
-            const container = document.getElementById('three-container');
-            if (container) {
-              container.appendChild(renderer.domElement);
-            }
-            
-            // 创建粒子系统
-            createParticles();
-            
-            // 创建灯光
-            createLights();
-            
-            // 添加页面滚动事件监听
-            window.addEventListener('scroll', onScroll);
-            
-            // 动画循环
-            animate();
-            
-            // 窗口大小调整
-            window.addEventListener('resize', onWindowResize);
-          } catch (error) {
-            console.warn('Three.js 初始化失败:', error);
-          }
-        }
+<div class="app" id="app">
 
-        function createParticles() {
-          if (typeof THREE === 'undefined') return;
-          
-          try {
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 5000; // 增加粒子数量
-            
-            particlePositions = new Float32Array(particlesCount * 3);
-            originalPositions = new Float32Array(particlesCount * 3);
-            
-            for (let i = 0; i < particlesCount * 3; i += 3) {
-              // 创建一个球形分布的粒子系统
-              const radius = Math.random() * 15; // 增大粒子分布范围
-              const theta = Math.random() * Math.PI * 2;
-              const phi = Math.acos(2 * Math.random() - 1);
-              
-              const x = radius * Math.sin(phi) * Math.cos(theta);
-              const y = radius * Math.sin(phi) * Math.sin(theta);
-              const z = radius * Math.cos(phi);
-              
-              particlePositions[i] = x;
-              particlePositions[i + 1] = y;
-              particlePositions[i + 2] = z;
-              
-              // 保存原始位置
-              originalPositions[i] = x;
-              originalPositions[i + 1] = y;
-              originalPositions[i + 2] = z;
-            }
-            
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-            
-            // 创建发光粒子材质
-            const particlesMaterial = new THREE.PointsMaterial({
-              size: 0.03,
-              color: 0x00f0ff,
-              transparent: true,
-              opacity: 0.8,
-              blending: THREE.AdditiveBlending,
-              depthWrite: false,
-              // 添加发光效果
-              map: createGlowTexture(),
-              sizeAttenuation: true
-            });
-            
-            particles = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particles);
-            
-            // 创建更多的连接线
-            createConnections();
-          } catch (error) {
-            console.warn('创建粒子系统失败:', error);
-          }
-        }
+  <div class="header">
+    <div class="header-titles">
+      <svg class="header-sigil" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10.5" stroke="currentColor" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.7"/>
+        <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="0.6" opacity="0.55"/>
+        <rect x="9" y="9" width="6" height="6" stroke="currentColor" stroke-width="0.6" opacity="0.7"/>
+        <circle cx="12" cy="12" r="1.4" fill="#F3E4B8"/>
+      </svg>
+      <div class="header-kicker">FIVE GODS OF WEALTH</div>
+      <div class="header-title">五路财神</div>
+      <div class="header-sub">招财进宝 · 迎祥纳福</div>
+    </div>
+    <div class="header-line"></div>
+  </div>
 
-        // 创建发光纹理
-        function createGlowTexture() {
-          const canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
-          const context = canvas.getContext('2d');
-          
-          const gradient = context.createRadialGradient(
-            canvas.width / 2,
-            canvas.height / 2,
-            0,
-            canvas.width / 2,
-            canvas.height / 2,
-            canvas.width / 2
-          );
-          
-          gradient.addColorStop(0, 'rgba(0, 240, 255, 1)');
-          gradient.addColorStop(0.2, 'rgba(0, 240, 255, 0.8)');
-          gradient.addColorStop(0.4, 'rgba(0, 240, 255, 0.4)');
-          gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
-          
-          context.fillStyle = gradient;
-          context.beginPath();
-          context.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
-          context.fill();
-          
-          return new THREE.CanvasTexture(canvas);
-        }
+  <div class="fan-stage" id="fanStage">
+    <div class="halo" id="halo">
+      <div class="glow-blob"></div>
+      <svg viewBox="0 0 200 200" fill="none" style="position:absolute;inset:0;width:100%;height:100%">
+        <g class="ring-outer">
+          <circle cx="100" cy="100" r="92" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1.5 6" opacity="0.5"/>
+          <circle cx="100" cy="100" r="84" stroke="currentColor" stroke-width="0.4" opacity="0.3"/>
+          <g opacity="0.7" fill="#E8C766"><circle cx="100" cy="8" r="1.8"/><circle cx="100" cy="192" r="1.8"/><circle cx="8" cy="100" r="1.8"/><circle cx="192" cy="100" r="1.8"/></g>
+        </g>
+        <g class="ring-inner">
+          <circle cx="100" cy="100" r="68" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 9" opacity="0.4"/>
+          <circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="0.4" stroke-dasharray="0.5 4" opacity="0.45"/>
+        </g>
+        <circle cx="100" cy="100" r="44" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+        <rect x="89" y="89" width="22" height="22" stroke="#E8C766" stroke-width="0.6" opacity="0.7"/>
+        <path d="M100 78 V89 M100 111 V122 M78 100 H89 M111 100 H122" stroke="#E8C766" stroke-width="0.5" opacity="0.6"/>
+      </svg>
+    </div>
+    <!-- cards injected by JS -->
+    <div class="swipe-hint" id="swipeHint">
+      <svg class="chev l" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      <span>左右滑动</span>
+      <svg class="chev r" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </div>
+  </div>
 
-        // 创建连接线
-        function createConnections() {
-          if (typeof THREE === 'undefined') return;
-          
-          try {
-            const lineMaterial = new THREE.LineBasicMaterial({
-              color: 0x00f0ff,
-              transparent: true,
-              opacity: 0.1,
-              blending: THREE.AdditiveBlending
-            });
-            
-            for (let i = 0; i < 100; i++) {
-              const lineGeometry = new THREE.BufferGeometry();
-              const linePoints = [];
-              
-              for (let j = 0; j < 3; j++) {
-                const radius = Math.random() * 15;
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos(2 * Math.random() - 1);
-                
-                linePoints.push(new THREE.Vector3(
-                  radius * Math.sin(phi) * Math.cos(theta),
-                  radius * Math.sin(phi) * Math.sin(theta),
-                  radius * Math.cos(phi)
-                ));
-              }
-              
-              lineGeometry.setFromPoints(linePoints);
-              const line = new THREE.Line(lineGeometry, lineMaterial);
-              scene.add(line);
-            }
-          } catch (error) {
-            console.warn('创建连接线失败:', error);
-          }
-        }
+  <!-- 云钱图腾 -->
+  <div class="ornament-wrap">
+    <svg class="ornament-svg" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="160" cy="40" rx="60" ry="12" fill="url(#cg)" opacity="0.4"/>
+      <use href="#vine"/><use href="#vine" transform="matrix(-1 0 0 1 320 0)"/>
+      <g stroke="url(#rg)" stroke-width="0.7" stroke-linecap="round" opacity="0.65"><path d="M160 10 V18"/><path d="M160 62 V70"/><path d="M128 26 L134 31"/><path d="M192 26 L186 31"/><path d="M128 54 L134 49"/><path d="M192 54 L186 49"/></g>
+      <circle cx="160" cy="40" r="17" stroke="url(#ring)" stroke-width="0.6" opacity="0.5"/>
+      <circle cx="160" cy="40" r="22" stroke="url(#ring)" stroke-width="0.4" stroke-dasharray="0.8 4.5" opacity="0.4"/>
+      <!-- 金钱 -->
+      <circle cx="160" cy="40" r="13" fill="url(#coinGlow)" opacity="0.5"/>
+      <circle cx="160" cy="40" r="12.5" fill="url(#coinFill)" stroke="#F3E4B8" stroke-width="0.6"/>
+      <rect x="154" y="34" width="12" height="12" fill="none" stroke="#7a5618" stroke-width="0.9"/>
+      <g fill="#F3E4B8"><path d="M100 16 l.8 2.2 2.2.8 -2.2.8 -.8 2.2 -.8-2.2 -2.2-.8 2.2-.8 z" opacity=".8"/><path d="M220 16 l.8 2.2 2.2.8 -2.2.8 -.8 2.2 -.8-2.2 -2.2-.8 2.2-.8 z" opacity=".8"/><circle cx="160" cy="6" r="1" opacity=".9"/></g>
+      <defs>
+        <g id="vine">
+          <path d="M14 42 C36 42 52 36 68 28 C80 22 92 24 101 33" stroke="url(#vg)" stroke-width="1" stroke-linecap="round" fill="none"/>
+          <path d="M30 42 C30 42 27 35 32 30 C37 25 44 27 46 32" stroke="url(#vg)" stroke-width="0.7" stroke-linecap="round" fill="none" opacity="0.7"/>
+          <path d="M22 42 q3 -6 0 -9 q-3 3 0 9 z" fill="url(#leaf)" opacity="0.65"/>
+          <path d="M68 28 q3.5 -4.5 8.5 -3 q-2.3 4.5 -8.5 3 z" fill="url(#leaf)" opacity="0.55"/>
+          <circle cx="101" cy="33" r="1.3" fill="#E8C766"/>
+        </g>
+        <linearGradient id="vg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#C9A24B" stop-opacity="0.1"/><stop offset="100%" stop-color="#E8C766" stop-opacity="0.8"/></linearGradient>
+        <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3FAE7A"/><stop offset="100%" stop-color="#1F6B47"/></linearGradient>
+        <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#C9A24B" stop-opacity="0"/><stop offset="50%" stop-color="#E8C766" stop-opacity="0.85"/><stop offset="100%" stop-color="#C9A24B" stop-opacity="0"/></linearGradient>
+        <radialGradient id="cg" cx="50%" cy="50%"><stop offset="0%" stop-color="#E8C766" stop-opacity="0.85"/><stop offset="100%" stop-color="#E8C766" stop-opacity="0"/></radialGradient>
+        <radialGradient id="coinGlow" cx="50%" cy="50%"><stop offset="0%" stop-color="#F3E4B8" stop-opacity="0.9"/><stop offset="100%" stop-color="#C9A24B" stop-opacity="0"/></radialGradient>
+        <linearGradient id="coinFill" x1="160" y1="27" x2="160" y2="53" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#F3E4B8"/><stop offset="100%" stop-color="#C9A24B"/></linearGradient>
+        <linearGradient id="rg" x1="160" y1="10" x2="160" y2="70" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E8C766" stop-opacity="0.15"/><stop offset="50%" stop-color="#E8C766" stop-opacity="0.9"/><stop offset="100%" stop-color="#E8C766" stop-opacity="0.15"/></linearGradient>
+      </defs>
+    </svg>
+  </div>
 
-        function createLights() {
-          if (typeof THREE === 'undefined') return;
-          
-          try {
-            const ambientLight = new THREE.AmbientLight(0x00f0ff, 0.5);
-            scene.add(ambientLight);
-            
-            const pointLight = new THREE.PointLight(0xff00ff, 1);
-            pointLight.position.set(0, 0, 5);
-            scene.add(pointLight);
-            
-            const pointLight2 = new THREE.PointLight(0x00ff8f, 1);
-            pointLight2.position.set(5, 5, 0);
-            scene.add(pointLight2);
-            
-            // 添加更多灯光以增强发光效果
-            const pointLight3 = new THREE.PointLight(0x00f0ff, 0.5);
-            pointLight3.position.set(-5, -5, 0);
-            scene.add(pointLight3);
-          } catch (error) {
-            console.warn('创建灯光失败:', error);
-          }
-        }
+  <div class="info-panel" id="infoPanel">
+    <div class="info-tag" id="infoTag"><span class="honor">正财神</span> · 中 路 · 玄坛真君</div>
+    <h2 class="info-name" id="infoName">赵公明</h2>
+    <div class="info-pinyin" id="infoPinyin">Zhao Gong Ming</div>
+    <div class="info-chips">
+      <span class="chip" id="chipElement"><svg id="iconEl" viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></svg><span id="chipElText">元宝</span></span>
+      <span class="chip bless" id="chipBless">迎祥纳福</span>
+    </div>
+    <p class="info-desc" id="infoDesc">道教尊为主财神，号玄坛真君、赵公元帅。黑面浓须，跨黑虎、执铁鞭，威镇玄坛，总司天下财源，主迎祥纳福、除瘟剪疟，民间奉为诸财神之首。</p>
+    <button class="detail-btn" id="detailBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      详细信息
+    </button>
+  </div>
 
-        // 页面滚动事件处理
-        function onScroll() {
-          if (!particles || !originalPositions) return;
-          
-          const scrollTop = window.pageYOffset;
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
-          const scrollProgress = scrollTop / (documentHeight - windowHeight);
-          
-          // 根据滚动进度调整粒子分布
-          const geometry = particles.geometry;
-          const positions = geometry.attributes.position.array;
-          
-          for (let i = 0; i < positions.length; i += 3) {
-            // 计算目标位置：滚动时粒子向中心聚合，滚动到底部时扩散
-            const targetX = originalPositions[i] * (1 - scrollProgress * 0.7);
-            const targetY = originalPositions[i + 1] * (1 - scrollProgress * 0.7);
-            const targetZ = originalPositions[i + 2] * (1 - scrollProgress * 0.7);
-            
-            // 平滑过渡
-            positions[i] += (targetX - positions[i]) * 0.05;
-            positions[i + 1] += (targetY - positions[i + 1]) * 0.05;
-            positions[i + 2] += (targetZ - positions[i + 2]) * 0.05;
-          }
-          
-          geometry.attributes.position.needsUpdate = true;
-        }
+  <div class="controls">
+    <div class="progress-line"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+    <div class="bottom-row" id="dotsRow">
+      <span class="ep-num" id="epNum">01 / 05</span>
+    </div>
+  </div>
 
-        function animate() {
-          if (typeof THREE === 'undefined') return;
-          
-          try {
-            requestAnimationFrame(animate);
-            
-            if (particles) {
-              // 缓慢旋转粒子系统
-              particles.rotation.x += 0.0002;
-              particles.rotation.y += 0.0003;
-              
-              // 为粒子添加微小的随机运动，使其更自然
-              const geometry = particles.geometry;
-              const positions = geometry.attributes.position.array;
-              
-              for (let i = 0; i < positions.length; i += 3) {
-                // 添加微小的随机位移
-                positions[i] += (Math.random() - 0.5) * 0.001;
-                positions[i + 1] += (Math.random() - 0.5) * 0.001;
-                positions[i + 2] += (Math.random() - 0.5) * 0.001;
-              }
-              
-              geometry.attributes.position.needsUpdate = true;
-            }
-            
-            if (renderer && scene && camera) {
-              renderer.render(scene, camera);
-            }
-          } catch (error) {
-            console.warn('动画循环失败:', error);
-          }
-        }
+</div>
 
-        function onWindowResize() {
-          if (typeof THREE === 'undefined') return;
-          
-          try {
-            if (camera) {
-              camera.aspect = window.innerWidth / window.innerHeight;
-              camera.updateProjectionMatrix();
-            }
-            
-            if (renderer) {
-              renderer.setSize(window.innerWidth, window.innerHeight);
-            }
-          } catch (error) {
-            console.warn('窗口大小调整失败:', error);
-          }
-        }
+<!-- 详细信息 overlay -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-grip"></div>
+    <div class="detail-head">
+      <div class="detail-kicker" id="dKicker"></div>
+      <div class="detail-name" id="dName"></div>
+      <div class="detail-pinyin" id="dPinyin"></div>
+      <button class="detail-close" id="detailClose" aria-label="关闭">✕</button>
+    </div>
+    <div class="detail-chips" id="dChips"></div>
+    <div class="detail-body">
+      <div class="detail-label"><span class="lbl-zh">详 细 事 迹</span><span class="lbl-en">DEEDS &amp; LORE</span></div>
+      <p class="detail-zh" id="dStoryZh"></p>
+      <div class="detail-divider"><span>ENGLISH</span></div>
+      <p class="detail-en" id="dStoryEn"></p>
+    </div>
+  </div>
+</div>
 
-        // 初始化Three.js
-        window.addEventListener('DOMContentLoaded', initThreeJS);
+<script>
+/* ====== 五路财神 data ====== */
+var DEITIES=[
+  {title:'正财神',honorFull:'玄坛真君',name:'赵公明',pinyin:'Zhao Gong Ming',glyph:'正',
+   img:'caishen_3_yingxiangnafu.png',dir:'中',bless:'迎祥纳福',element:'元宝',icon:'ingot',
+   c:'#1a1208',cd:'#0a0603',cg:'#D9B05A',accent:'#D9B05A',accentDeep:'#3D2E10',accentGlow:'#E8C766',
+   desc:'道教尊为主财神，号玄坛真君、赵公元帅。黑面浓须，跨黑虎、执铁鞭，威镇玄坛，总司天下财源，主迎祥纳福、除瘟剪疟，民间奉为诸财神之首。'},
+  {title:'纳珍天尊',honorFull:'聚宝守富',name:'曹宝',pinyin:'Cao Bao',glyph:'纳',
+   img:'caishen_2_zhaobaofengsheng.png',dir:'西',bless:'招宝丰盛',element:'聚宝盆',icon:'bowl',
+   c:'#5e1620',cd:'#2c0a10',cg:'#C8324A',accent:'#D14B5C',accentDeep:'#5C1721',accentGlow:'#D6485A',
+   desc:'赵公明座前四将之一，职司"纳珍"。专司聚敛四方奇珍异宝、收纳入库，使宝气盈门、积富累财，乃聚宝守富之神。'},
+  {title:'利市仙官',honorFull:'市利兴隆',name:'姚少司',pinyin:'Yao Shao Si',glyph:'利',
+   img:'caishen_4_lishixinglong.png',dir:'北',bless:'利市兴隆',element:'算盘',icon:'abacus',
+   c:'#143e54',cd:'#0a2330',cg:'#3E8FB0',accent:'#4FA9CC',accentDeep:'#0F3A52',accentGlow:'#4FA3C6',
+   desc:'赵公明门下弟子，职司"利市"。主商贾货殖、市集买卖，佑开市利市、营生兴旺，为商贾铺户所奉之招财吉神。'},
+  {title:'招财使者',honorFull:'引财纳吉',name:'陈九公',pinyin:'Chen Jiu Gong',glyph:'招',
+   img:'caishen_1_zhaocaijinbao.png',dir:'东',bless:'招财进宝',element:'金蟾',icon:'toad',
+   c:'#13502f',cd:'#0a2c1a',cg:'#3FAE7A',accent:'#4FC090',accentDeep:'#134A2E',accentGlow:'#5BC99A',
+   desc:'赵公明门下弟子，职司"招财"。手执招财之幡，广引八方财气入门，使财源如春潮涌至、生意盎然，为引财纳吉之使。'},
+  {title:'进宝财神',honorFull:'珠玉满堂',name:'萧升',pinyin:'Xiao Sheng',glyph:'进',
+   img:'caishen_5_gongxifacai.png',dir:'南',bless:'恭喜发财',element:'钱串',icon:'coins',
+   c:'#6e1f14',cd:'#360d08',cg:'#D14A33',accent:'#E05A3C',accentDeep:'#6E1A14',accentGlow:'#E05643',
+   desc:'相传执"落宝金钱"，能收天下法宝。职司"进宝"，专迎金银入库、珠玉满堂，使财宝源源而进、家业丰盈。'}
+];
 
-        // 平滑滚动效果
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-              window.scrollTo({
-                top: targetElement.offsetTop - 80,
-                behavior: 'smooth'
-              });
-            }
-          });
-        });
+/* element icon paths */
+var ICONS={
+ ingot:'<path d="M4 14 C4 10 8 7 12 7 C16 7 20 10 20 14 L20 16 C20 17 19 17.5 18 17.5 L6 17.5 C5 17.5 4 17 4 16 Z"/><path d="M7 11 C9 9.5 15 9.5 17 11"/><path d="M2 16 H22"/>',
+ bowl:'<path d="M3 12 H21 C21 17 17 20 12 20 C7 20 3 17 3 12 Z"/><path d="M3 12 C3 9 7 8 12 8 C17 8 21 9 21 12"/><circle cx="9" cy="6.5" r="1.3"/><circle cx="12" cy="5.5" r="1.3"/><circle cx="15" cy="6.5" r="1.3"/>',
+ abacus:'<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 10 H21 M3 15 H21"/><path d="M7 5 V19 M12 5 V19 M17 5 V19"/><circle cx="7" cy="7.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r=".9" fill="currentColor" stroke="none"/><circle cx="7" cy="12.5" r=".9" fill="currentColor" stroke="none"/><circle cx="17" cy="12.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r=".9" fill="currentColor" stroke="none"/>',
+ toad:'<ellipse cx="12" cy="14" rx="8" ry="6"/><circle cx="8.5" cy="9" r="2.2"/><circle cx="15.5" cy="9" r="2.2"/><circle cx="8.5" cy="9" r=".8" fill="currentColor" stroke="none"/><circle cx="15.5" cy="9" r=".8" fill="currentColor" stroke="none"/><path d="M9 16 Q12 18 15 16"/><path d="M4 18 L2 20 M20 18 L22 20"/>',
+ coins:'<path d="M12 3 V21"/><ellipse cx="12" cy="6" rx="4" ry="1.6"/><ellipse cx="12" cy="6" rx="4" ry="1.6" opacity=".5"/><ellipse cx="12" cy="12" rx="4" ry="1.6"/><ellipse cx="12" cy="18" rx="4" ry="1.6"/>'
+};
 
-        // 技能图表可视化
-        window.addEventListener('DOMContentLoaded', function() {
-          // 移除对Chart.js的依赖，使用纯CSS实现技能展示
-          console.log('技能图表使用纯CSS实现，无需Chart.js');
-        });
+/* ====== build cards ====== */
+var fanStage=document.getElementById('fanStage');
+var swipeHint=document.getElementById('swipeHint');
+function cardHTML(d,i){
+  return '<div class="card" data-i="'+i+'" style="--c:'+d.c+';--cd:'+d.cd+';--cg:'+d.cg+';--accent:'+d.accent+';--accent-deep:'+d.accentDeep+';--accent-glow:'+d.accentGlow+'">'+
+    '<div class="card-inner">'+
+      '<div class="card-bg"></div>'+
+      '<div class="card-pattern"></div>'+
+      '<div class="card-glow"></div>'+
+      '<div class="card-pedestal"></div>'+
+      '<img class="card-figure" src="'+d.img+'" alt="'+d.name+'" draggable="false">'+
+      '<div class="card-shimmer"></div>'+
+      '<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>'+
+      '<div class="card-seal"><span>'+d.glyph+'</span></div>'+
+      '<div class="card-label">'+
+        '<div class="card-honor">'+d.title+'</div>'+
+        '<div class="card-name">'+d.name+'</div>'+
+        '<div class="card-pinyin">'+d.pinyin+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card-trail"></div>'+
+  '</div>';
+}
+fanStage.insertAdjacentHTML('afterbegin',DEITIES.map(cardHTML).join(''));
 
-        // 滚动动画效果
-        function animateOnScroll() {
-          const elements = document.querySelectorAll('.section');
-          
-          elements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const elementVisible = 150;
-            
-            if (elementTop < window.innerHeight - elementVisible) {
-              element.classList.add('animate');
-            }
-          });
-        }
+/* dots */
+var dotsRow=document.getElementById('dotsRow');
+var dotsHTML='';for(var k=0;k<DEITIES.length;k++){dotsHTML+='<div class="p-dot" data-i="'+k+'"></div>';}
+dotsRow.insertAdjacentHTML('afterbegin',dotsHTML);
 
-        window.addEventListener('scroll', animateOnScroll);
+var cards=document.querySelectorAll('.card');
+var dots=document.querySelectorAll('.p-dot');
+var total=DEITIES.length,cur=0,animating=false;
 
-        // 表单提交处理
-        document.querySelector('form').addEventListener('submit', function(e) {
-          e.preventDefault();
-          
-          const name = this.querySelector('input[type="text"]').value;
-          const email = this.querySelector('input[type="email"]').value;
-          const message = this.querySelector('textarea').value;
-          
-          // 模拟表单提交
-          console.log('表单提交:', { name, email, message });
-          
-          // 显示提交成功消息
-          alert('消息发送成功！我们会尽快与您联系。');
-          
-          // 重置表单
-          this.reset();
-        });
+var progressFill=document.getElementById('progressFill');
+var epNum=document.getElementById('epNum');
+var infoTag=document.getElementById('infoTag');
+var infoName=document.getElementById('infoName');
+var infoPinyin=document.getElementById('infoPinyin');
+var infoDesc=document.getElementById('infoDesc');
+var chipElText=document.getElementById('chipElText');
+var chipBless=document.getElementById('chipBless');
+var iconEl=document.getElementById('iconEl');
+var root=document.documentElement;
 
-        // 技能条动画
-        function animateSkillBars() {
-          const skillBars = document.querySelectorAll('.skill-fill');
-          
-          skillBars.forEach(bar => {
-            const width = bar.style.width;
-            bar.style.width = '0';
-            
-            setTimeout(() => {
-              bar.style.width = width;
-            }, 300);
-          });
-        }
+function rel(idx){var diff=idx-cur;if(diff>total/2)diff-=total;if(diff<-total/2)diff+=total;return diff;}
+function posCard(idx){
+  var c=cards[idx];
+  c.classList.remove('active','left','right','hidden','instant','trailing');
+  c.style.transform='';
+  var ci=c.querySelector('.card-inner');if(ci)ci.style.filter='';
+  var d=rel(idx);
+  if(d===0)c.classList.add('active');
+  else if(d===1||d===-(total-1))c.classList.add('right');
+  else if(d===-1||d===total-1)c.classList.add('left');
+  else c.classList.add('hidden');
+}
+function updateInfo(){
+  var d=DEITIES[cur];
+  root.style.setProperty('--accent',d.accent);
+  root.style.setProperty('--accent-deep',d.accentDeep);
+  root.style.setProperty('--accent-glow',d.accentGlow);
+  infoTag.innerHTML='<span class="honor">'+d.title+'</span> · '+d.dir+' 路 · '+d.honorFull;
+  infoName.textContent=d.name;
+  infoPinyin.textContent=d.pinyin;
+  infoDesc.textContent=d.desc;
+  chipElText.textContent=d.element;
+  chipBless.textContent=d.bless;
+  iconEl.innerHTML=ICONS[d.icon]||'';
+  dots.forEach(function(dt,i){dt.classList.toggle('active',i===cur);});
+  progressFill.style.width=((cur+1)/total*100)+'%';
+  epNum.textContent=(cur<9?'0':'')+(cur+1)+' / 0'+total;
+}
+function go(i){
+  if(animating||dragging)return;
+  dismissHint();
+  animating=true;cur=(i+total)%total;
+  for(var j=0;j<total;j++)posCard(j);
+  updateInfo();
+  setTimeout(function(){animating=false;},800);
+}
+var hintTimer=null;
+function showSwipeHint(){if(!swipeHint)return;clearTimeout(hintTimer);swipeHint.classList.remove('gone');swipeHint.classList.remove('show');void swipeHint.offsetWidth;swipeHint.classList.add('show');hintTimer=setTimeout(dismissHint,5200);}
+function dismissHint(){clearTimeout(hintTimer);swipeHint.classList.add('gone');swipeHint.classList.remove('show');}
 
-        // 当技能部分进入视口时触发动画
-        const skillsSection = document.getElementById('skills');
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              animateSkillBars();
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.5 });
+for(var j=0;j<total;j++)posCard(j);
+updateInfo();
 
-        if (skillsSection) {
-          observer.observe(skillsSection);
-        }
+/* ====== 金沙 ====== */
+(function makeMotes(){
+  var box=document.getElementById('particles');
+  var n=20;
+  for(var i=0;i<n;i++){
+    var m=document.createElement('div');
+    var r=Math.random();
+    var cls='mote '+(r<0.18?'coin ':r<0.3?'ruby ':'')+(Math.random()<0.4?'tw ':'');
+    m.className=cls;
+    var sz=1.5+Math.random()*3;m.style.width=sz+'px';m.style.height=sz+'px';
+    m.style.left=(Math.random()*100)+'%';
+    var dur=10+Math.random()*10;
+    m.style.animationDuration=(Math.random()<0.4?'2.2s,':'')+dur+'s';
+    m.style.animationDelay=(-Math.random()*dur)+'s';
+    box.appendChild(m);
+  }
+})();
 
-        // 导航栏滚动效果
-        window.addEventListener('scroll', function() {
-          const navbar = document.querySelector('.navbar');
-          
-          if (window.scrollY > 100) {
-            navbar.style.backgroundColor = 'rgba(10, 10, 10, 0.95)';
-          } else {
-            navbar.style.backgroundColor = 'rgba(10, 10, 10, 0.8)';
-          }
-        });
+/* ====== swipe ====== */
+var dragging=false,moved=false,startX=0,dx=0,lastX=0,lastT=0,velocity=0;
+function isInteractive(t){return !!(t&&t.closest&&t.closest('.p-dot,.detail-btn'));}
+function down(e){
+  if(animating)return;
+  if(isInteractive(e.target))return;
+  dragging=true;moved=false;startX=e.clientX;dx=0;lastX=e.clientX;lastT=performance.now();velocity=0;
+  cards.forEach(function(c){c.classList.add('instant');});
+  try{app.setPointerCapture(e.pointerId);}catch(_){}
+}
+function move(e){
+  if(!dragging)return;
+  var x=e.clientX;dx=x-startX;
+  if(Math.abs(dx)>8)moved=true;
+  var now=performance.now(),dt=now-lastT;
+  if(dt>0)velocity=(x-lastX)/dt;
+  lastX=x;lastT=now;
+  var a=cards[cur];
+  var tilt=Math.max(-12,Math.min(12,velocity*60+dx*0.02));
+  a.style.transform='translateX('+dx+'px) translateY(-8px) scale(1.05) rotate('+tilt+'deg)';
+  if(Math.abs(velocity)>0.5)a.classList.add('trailing');else a.classList.remove('trailing');
+  cards.forEach(function(c,i){
+    if(i===cur)return;
+    var d=rel(i);
+    if(d===1||d===-(total-1))c.style.transform='translateX(47%) rotateZ(13deg) translateY(30px) scale(0.88) translateX('+(dx*0.18)+'px)';
+    else if(d===-1||d===total-1)c.style.transform='translateX(-47%) rotateZ(-13deg) translateY(30px) scale(0.88) translateX('+(dx*0.18)+'px)';
+  });
+  root.style.setProperty('--parallax',(dx*0.05)+'px');
+}
+function up(){
+  if(!dragging)return;dragging=false;
+  cards.forEach(function(c){c.classList.remove('instant','trailing');});
+  var thr=50;
+  var goNext=dx<-thr||velocity<-0.45;
+  var goPrev=dx>thr||velocity>0.45;
+  if(goNext||goPrev)dismissHint();
+  if(goNext)cur=(cur+1)%total;
+  else if(goPrev)cur=(cur-1+total)%total;
+  dx=0;velocity=0;
+  root.style.setProperty('--parallax','0px');
+  animating=true;
+  for(var k=0;k<total;k++)posCard(k);
+  updateInfo();
+  setTimeout(function(){animating=false;},800);
+}
+var app=document.getElementById('app');
+app.addEventListener('pointerdown',down);
+app.addEventListener('pointermove',move);
+app.addEventListener('pointerup',up);
+app.addEventListener('pointercancel',up);
+cards.forEach(function(c){
+  c.addEventListener('click',function(){
+    var idx=parseInt(c.dataset.i);
+    if(moved){moved=false;return;}
+    if(idx!==cur)go(idx);
+  });
+});
+dots.forEach(function(d){d.addEventListener('click',function(){go(parseInt(d.dataset.i));});});
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+/* swipe hint is shown after the intro reveal via showSwipeHint() */
 
-        // 项目卡片悬停效果
-        const projectItems = document.querySelectorAll('.project-item');
+/* ====== 详细信息 detail (bilingual deeds) ====== */
+var STORIES=[
+ {zh:'道教主财神，原型见于明代神魔小说《封神演义》。赵公明修道于峨眉山罗浮洞，跨黑虎，执缚龙索与定海珠，武艺通神。商周之际受闻太师之请下山助商，连败周营数将，终为陆压以"钉头七箭书"之术咒杀。封神台上，姜子牙敕封其为"金龙如意正一龙虎玄坛真君"，统领招宝、纳珍、招财、利市四路尊神，故世称"玄坛真君""赵公元帅"。民间奉其总司天下财源、迎祥纳福，亦能驱雷役电、除瘟剪疟，商铺家宅多供奉其像，为诸财神之首。',
+  en:"The principal God of Wealth in Taoism, originating from the Ming-dynasty novel 'Investiture of the Gods' (Fengshen Yanyi). Zhao Gongming cultivated the Dao at Luofu Cave on Mount Emei, rode a black tiger, and wielded the Binding-Dragon Rope and the Sea-Calming Pearls. Invited by Grand Preceptor Wen to aid the Shang, he defeated several Zhou generals before being slain by the Seven-Arrow Book curse of Lu Ya. On the investiture altar, Jiang Ziya deified him as True Lord of the Martial Altar, commanding four wealth officers. Venerated as sovereign of all fortune, he drives thunder, dispels plague, and ushers in prosperity — the foremost of the wealth gods."},
+ {zh:'《封神演义》中五夷山散仙，与萧升为友，情同手足。赵公明以定海珠连伤周将，萧升祭起法宝"落宝金钱"将其打下，曹宝遂拾得定海珠。后燃灯道人欲破"红砂阵"，曹宝慷慨代之入阵而殒命。封神后受封"纳珍天尊"，职司聚敛、收纳四方奇珍异宝入库，佑家宅积富、宝气充盈，为聚宝守富之神。',
+  en:"A wandering immortal of Mount Wuyi in 'Investiture of the Gods', sworn brother of Xiao Sheng. When the Sea-Calming Pearls of Zhao Gongming wounded the Zhou generals, Xiao Sheng loosed the Treasure-Dropping Coin to strike them down, and Cao Bao gathered up the Pearls. He later died entering the lethal Red Sand Formation in the stead of the immortal Ran Deng. Deified as Heavenly Lord of Treasure-Gathering, he gathers and stores rare treasures from all directions, blessing households with accumulated wealth and brimming treasure."},
+ {zh:'封神演义中赵公明门下弟子，随师下山助商，战死沙场。受封"利市仙官"。"利市"一词本义为买卖获利、吉庆有余，故姚少司主商贾货殖、市集兴旺，佑开市生利、营生顺遂，乃商贾铺户与年初"开市"所奉之吉神，民间迎春开市常焚香以祈鸿利。',
+  en:"A disciple of Zhao Gongming in 'Investiture of the Gods' who followed his master to aid the Shang and fell in battle. Deified as Immortal Officer of Profitable Markets. The term lishi denotes profit in trade and auspicious surplus; thus Yao Shaosi presides over commerce, thriving markets, and prosperous openings — the patron of merchants and shopkeepers, especially invoked at the New Year opening of business."},
+ {zh:'赵公明座下弟子，封神之战中随师助商，殁于阵中。受封"招财使者"，执掌招财之幡，广引八方财气入门，佑财源涌至、生意常青，主"引财纳吉"。与利市仙官、纳珍天尊、招宝天尊并列为玄坛真君座前四大财神，合称玄坛四将。',
+  en:"A disciple of Zhao Gongming who aided the Shang and perished in the divine war. Deified as Envoy of Wealth-Beckoning, he holds the banner that summons fortune, drawing wealth from the eight directions into the home — blessing the inflow of riches and evergreen trade. Alongside the officers of Profit, Treasure-Gathering, and Treasure-Beckoning, he is one of the four wealth generals attending the True Lord of the Martial Altar."},
+ {zh:'五夷山散仙，曹宝挚友。曾以法宝"落宝金钱"打下赵公明的定海珠，救燃灯道人于危难。封神之后，民间奉其为"进宝财神"（一作招宝天尊），职司迎金银入库、珠玉满堂，使财宝源源而进、家业丰盈；其"落宝金钱"亦化作聚财进宝的吉兆，流传至今。',
+  en:"A wandering immortal of Mount Wuyi and dear friend of Cao Bao. He wielded the treasure Treasure-Dropping Coin to strike down the Sea-Calming Pearls of Zhao Gongming, saving the immortal Ran Deng from peril. In folk belief he is venerated as God of Wealth of Treasure-Bringing (also titled Heavenly Lord of Treasure-Beckoning), presiding over gold and silver flowing into the treasury and jewels filling the hall. His Treasure-Dropping Coin endures as an auspicious emblem of gathering and advancing wealth."}
+];
+(function(){
+  var overlay=document.getElementById('detailOverlay');
+  var panel=document.getElementById('detailPanel');
+  var dKicker=document.getElementById('dKicker'),dName=document.getElementById('dName'),dPinyin=document.getElementById('dPinyin');
+  var dChips=document.getElementById('dChips'),dStoryZh=document.getElementById('dStoryZh'),dStoryEn=document.getElementById('dStoryEn');
+  function openDetail(){
+    var d=DEITIES[cur];
+    dKicker.innerHTML=d.title+' · '+d.dir+' 路';
+    dName.textContent=d.name;
+    dPinyin.textContent=d.pinyin;
+    dChips.innerHTML='<span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[d.icon]||'')+'</svg>'+d.element+'</span><span class="chip bless">'+d.bless+'</span>';
+    dStoryZh.textContent=STORIES[cur].zh;
+    dStoryEn.textContent=STORIES[cur].en;
+    panel.scrollTop=0;
+    overlay.classList.add('open');
+  }
+  function closeDetail(){overlay.classList.remove('open');}
+  document.getElementById('detailBtn').addEventListener('click',openDetail);
+  document.getElementById('detailClose').addEventListener('click',closeDetail);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeDetail();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDetail();});
+})();
 
-        projectItems.forEach(item => {
-          item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
-          });
-          
-          item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-          });
-        });
-
-        // 打字机效果
-        function typeWriter(element, text, speed = 100) {
-          let i = 0;
-          element.innerHTML = '';
-          
-          function type() {
-            if (i < text.length) {
-              element.innerHTML += text.charAt(i);
-              i++;
-              setTimeout(type, speed);
-            }
-          }
-          
-          type();
-        }
-
-        // 当页面加载完成后，为标题添加打字机效果
-        window.addEventListener('load', function() {
-          const subtitleElements = document.querySelectorAll('.neon-text');
-          const subtitles = ['日语爱好者', '办公自动化专家', '细心可靠'];
-          
-          subtitleElements.forEach((element, index) => {
-            if (subtitles[index]) {
-              setTimeout(() => {
-                typeWriter(element, subtitles[index], 150);
-              }, index * 1000);
-            }
-          });
-        });
-
-        // 鼠标跟随效果
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        window.addEventListener('mousemove', function(e) {
-          cursor.style.left = e.clientX + 'px';
-          cursor.style.top = e.clientY + 'px';
-        });
-
-        // 为链接和按钮添加鼠标跟随效果
-        const interactiveElements = document.querySelectorAll('a, button');
-
-        interactiveElements.forEach(element => {
-          element.addEventListener('mouseenter', function() {
-            cursor.classList.add('cursor-hover');
-          });
-          
-          element.addEventListener('mouseleave', function() {
-            cursor.classList.remove('cursor-hover');
-          });
-        });
-
-        // 页面加载动画
-        window.addEventListener('load', function() {
-          const loader = document.createElement('div');
-          loader.classList.add('loader');
-          loader.innerHTML = `
-            <div class="loader-content">
-              <div class="loader-spinner"></div>
-              <p>加载中...</p>
-            </div>
-          `;
-          
-          document.body.appendChild(loader);
-          
-          // 页面加载完成后隐藏加载动画
-          setTimeout(() => {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-              loader.remove();
-            }, 500);
-          }, 1500);
-        });
-
-        // 滚动时的视差效果
-        window.addEventListener('scroll', function() {
-          const scrolled = window.pageYOffset;
-          const gridContainer = document.querySelector('.grid-container');
-          
-          if (gridContainer) {
-            gridContainer.style.transform = `translateY(${scrolled * 0.2}px)`;
-          }
-        });
-
-        // 响应式导航栏
-        function toggleNavbar() {
-          const navbar = document.querySelector('.navbar ul');
-          navbar.classList.toggle('active');
-        }
-    </script>
+/* ====== 开光仪式 intro ====== */
+(function(){
+  var intro=document.getElementById('intro');
+  function enterApp(){var l=document.getElementById('landing');l.classList.remove('open');setTimeout(function(){l.style.display='none';showSwipeHint();},650);}
+  var enterBtn=document.getElementById('enterBtn');
+  if(enterBtn)enterBtn.addEventListener('click',enterApp);
+  if(/[?&]skip=1\b/.test(location.search)){intro.style.display='none';document.getElementById('landing').classList.add('open');return;}
+  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var skip=document.getElementById('introSkip');
+  var timers=[],done=false;
+  function T(fn,ms){timers.push(setTimeout(fn,ms));}
+  function reveal(){if(done)return;done=true;timers.forEach(clearTimeout);
+    document.getElementById('introVeil').classList.add('on');
+    T(function(){intro.classList.add('hidden');document.getElementById('landing').classList.add('open');},360);
+    T(function(){intro.style.display='none';},1000);
+  }
+  function spawnBurst(){
+    var b=document.getElementById('introBurst');if(!b)return;var n=18;
+    for(var i=0;i<n;i++){
+      var d=document.createElement('div');d.className='bit';
+      var ang=(Math.PI*2*i/n)+(Math.random()-.5)*.45;
+      var dist=80+Math.random()*160;
+      d.style.setProperty('--tx',(Math.cos(ang)*dist)+'px');
+      d.style.setProperty('--ty',(Math.sin(ang)*dist)+'px');
+      d.style.animationDelay=(Math.random()*0.12)+'s';
+      var sz=4+Math.random()*7;d.style.width=sz+'px';d.style.height=sz+'px';
+      b.appendChild(d);
+    }
+    b.classList.add('go');
+  }
+  if(reduced){intro.classList.add('go','ignite');T(function(){skip.classList.add('on');},200);T(reveal,1300);return;}
+  intro.classList.add('go');                                     // 法阵自绘 + 灰字浮现
+  T(function(){skip.classList.add('on');},700);
+  T(function(){intro.classList.add('shaft-on');},2050);          // 金光下注
+  T(function(){                                               // 开光：点金 + 亮闪 + 金沙迸发
+    intro.classList.add('ignite');
+    document.getElementById('introFlash').classList.add('on');
+    spawnBurst();
+  },2700);
+  T(function(){document.getElementById('introSeal').classList.add('drop');},3000);  // 朱印盖落
+  T(reveal,3850);                                               // 金幕收尾 → 入殿
+  skip.addEventListener('click',reveal);
+})();
+</script>
 </body>
 </html>
